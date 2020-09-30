@@ -11,4 +11,8 @@ del *.omf /s
 del *.plg /s
 del *.rpt /s
 del *.tmp /s
+del *.__i /s
+del *.crf /s
+
+
 
