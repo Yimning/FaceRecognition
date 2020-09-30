@@ -1,0 +1,2 @@
+# FaceRecognition
+利用探索者STM32F4开发板实现人脸识别
