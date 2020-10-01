@@ -61,6 +61,46 @@ void my_mem_init(u8 memx)
 //获取内存使用率
 //memx:所属内存块
 //返回值:使用率(0~100)
+u8 my_mem_perused(u8 memx)  
+{  
+    u32 used=0;  
+    u32 i;  
+    for(i=0;i<memtblsize[memx];i++)  
+    {  
+        if(mallco_dev.memmap[memx][i])used++; 
+    } 
+    return (used*100)/(memtblsize[memx]);  
+}  
+//内存分配(内部调用)
+//memx:所属内存块
+//size:要分配的内存大小(字节)
+//返回值:0XFFFFFFFF,代表错误;其他,内存偏移地址 
+u32 my_mem_malloc(u8 memx,u32 size)  
+{  
+    signed long offset=0;  
+    u32 nmemb;	//需要的内存块数  
+	u32 cmemb=0;//连续空内存块数
+    u32 i;  
+    if(!mallco_dev.memrdy[memx])mallco_dev.init(memx);//未初始化,先执行初始化 
+    if(size==0)return 0XFFFFFFFF;//不需要分配
+    nmemb=size/memblksize[memx];  	//获取需要分配的连续内存块数
+    if(size%memblksize[memx])nmemb++;  
+    for(offset=memtblsize[memx]-1;offset>=0;offset--)//搜索整个内存控制区  
+    {     
+		if(!mallco_dev.memmap[memx][offset])cmemb++;//连续空内存块数增加
+		else cmemb=0;								//连续内存块清零
+		if(cmemb==nmemb)							//找到了连续nmemb个空内存块
+		{
+            for(i=0;i<nmemb;i++)  					//标注内存块非空 
+            {  
+                mallco_dev.memmap[memx][offset+i]=nmemb;  
+            }  
+            return (offset*memblksize[memx]);//返回偏移地址  
+		}
+    }  
+    return 0XFFFFFFFF;//未找到符合分配条件的内存块  
+}  
+
 
 
 
