@@ -144,6 +144,11 @@ void *mymalloc(u8 memx,u32 size)
     if(offset==0XFFFFFFFF)return NULL;  
     else return (void*)((u32)mallco_dev.membase[memx]+offset);  
 }  
+//重新分配内存(外部调用)
+//memx:所属内存块
+//*ptr:旧内存首地址
+//size:要分配的内存大小(字节)
+//返回值:新分配到的内存首地址.
 
 
 
