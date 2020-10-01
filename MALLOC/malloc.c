@@ -149,6 +149,18 @@ void *mymalloc(u8 memx,u32 size)
 //*ptr:旧内存首地址
 //size:要分配的内存大小(字节)
 //返回值:新分配到的内存首地址.
+void *myrealloc(u8 memx,void *ptr,u32 size)  
+{  
+    u32 offset;    
+    offset=my_mem_malloc(memx,size);   	
+    if(offset==0XFFFFFFFF)return NULL;     
+    else  
+    {  									   
+	    mymemcpy((void*)((u32)mallco_dev.membase[memx]+offset),ptr,size);	//拷贝旧内存内容到新内存   
+        myfree(memx,ptr);  											  		//释放旧内存
+        return (void*)((u32)mallco_dev.membase[memx]+offset);  				//返回新内存首地址
+    }  
+}
 
 
 
