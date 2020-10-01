@@ -58,8 +58,9 @@ void my_mem_init(u8 memx)
 	mymemset(mallco_dev.membase[memx], 0,memsize[memx]);	//内存池所有数据清零  
 	mallco_dev.memrdy[memx]=1;								//内存管理初始化OK  
 }  
-
-
+//获取内存使用率
+//memx:所属内存块
+//返回值:使用率(0~100)
 
 
 
