@@ -100,6 +100,29 @@ u32 my_mem_malloc(u8 memx,u32 size)
     }  
     return 0XFFFFFFFF;//未找到符合分配条件的内存块  
 }  
+//释放内存(内部调用) 
+//memx:所属内存块
+//offset:内存地址偏移
+//返回值:0,释放成功;1,释放失败;  
+u8 my_mem_free(u8 memx,u32 offset)  
+{  
+    int i;  
+    if(!mallco_dev.memrdy[memx])//未初始化,先执行初始化
+	{
+		mallco_dev.init(memx);    
+        return 1;//未初始化  
+    }  
+    if(offset<memsize[memx])//偏移在内存池内. 
+    {  
+        int index=offset/memblksize[memx];			//偏移所在内存块号码  
+        int nmemb=mallco_dev.memmap[memx][index];	//内存块数量
+        for(i=0;i<nmemb;i++)  						//内存块清零
+        {  
+            mallco_dev.memmap[memx][index+i]=0;  
+        }  
+        return 0;  
+    }else return 2;//偏移超区了.  
+}  
 
 
 
