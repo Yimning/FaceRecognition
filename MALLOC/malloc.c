@@ -138,7 +138,12 @@ void myfree(u8 memx,void *ptr)
 //size:内存大小(字节)
 //返回值:分配到的内存首地址.
 void *mymalloc(u8 memx,u32 size)  
-
+{  
+    u32 offset;   
+	offset=my_mem_malloc(memx,size);  	   	 	   
+    if(offset==0XFFFFFFFF)return NULL;  
+    else return (void*)((u32)mallco_dev.membase[memx]+offset);  
+}  
 
 
 
