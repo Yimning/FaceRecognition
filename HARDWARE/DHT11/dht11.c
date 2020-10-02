@@ -39,7 +39,6 @@ u8 DHT11_Check(void)
 	if(retry>=100)return 1;	    
 	return 0;
 }
-
 //从DHT11读取一个位
 //返回值：1/0
 u8 DHT11_Read_Bit(void) 			 
@@ -60,7 +59,6 @@ u8 DHT11_Read_Bit(void)
 	if(DHT11_DQ_IN)return 1;
 	else return 0;		   
 }
-
 //从DHT11读取一个字节
 //返回值：读到的数据
 u8 DHT11_Read_Byte(void)    
@@ -74,17 +72,6 @@ u8 DHT11_Read_Byte(void)
     }						    
     return dat;
 }
-
-
-
-
-
-
-
-
-
-
-
 //从DHT11读取一次数据
 //temp:温度值(范围:0~50°)
 //humi:湿度值(范围:20%~90%)
@@ -118,6 +105,11 @@ u8 DHT11_Init(void)
 	DHT11_Rst();
 	return DHT11_Check();
 }
+
+
+
+
+
 
 
 
