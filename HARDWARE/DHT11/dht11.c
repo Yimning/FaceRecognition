@@ -40,18 +40,26 @@ u8 DHT11_Check(void)
 	return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+//从DHT11读取一个位
+//返回值：1/0
+u8 DHT11_Read_Bit(void) 			 
+{
+ 	u8 retry=0;
+	while(DHT11_DQ_IN&&retry<100)//等待变为低电平
+	{
+		retry++;
+		delay_us(1);
+	}
+	retry=0;
+	while(!DHT11_DQ_IN&&retry<100)//等待变高电平
+	{
+		retry++;
+		delay_us(1);
+	}
+	delay_us(40);//等待40us
+	if(DHT11_DQ_IN)return 1;
+	else return 0;		   
+}
 
 
 
