@@ -61,6 +61,20 @@ u8 DHT11_Read_Bit(void)
 	else return 0;		   
 }
 
+//从DHT11读取一个字节
+//返回值：读到的数据
+u8 DHT11_Read_Byte(void)    
+{        
+    u8 i,dat;
+    dat=0;
+	for (i=0;i<8;i++) 
+	{
+   		dat<<=1; 
+	    dat|=DHT11_Read_Bit();
+    }						    
+    return dat;
+}
+
 
 
 
