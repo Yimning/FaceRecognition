@@ -51,6 +51,55 @@ u8 DS18B20_Read_Bit(void)
     return data;
 }
 
+//从DS18B20读取一个字节
+//返回值：读到的数据
+u8 DS18B20_Read_Byte(void)    
+{        
+    u8 i,j,dat;
+    dat=0;
+	for (i=1;i<=8;i++) 
+	{
+        j=DS18B20_Read_Bit();
+        dat=(j<<7)|(dat>>1);
+    }						    
+    return dat;
+}
+//写一个字节到DS18B20
+//dat：要写入的字节
+void DS18B20_Write_Byte(u8 dat)     
+ {             
+    u8 j;
+    u8 testb;
+	DS18B20_IO_OUT();//SET PG11 OUTPUT;
+    for (j=1;j<=8;j++) 
+	{
+        testb=dat&0x01;
+        dat=dat>>1;
+        if (testb) 
+        {
+            DS18B20_DQ_OUT=0;// Write 1
+            delay_us(2);                            
+            DS18B20_DQ_OUT=1;
+            delay_us(60);             
+        }
+        else 
+        {
+            DS18B20_DQ_OUT=0;// Write 0
+            delay_us(60);             
+            DS18B20_DQ_OUT=1;
+            delay_us(2);                          
+        }
+    }
+}
+//开始温度转换
+void DS18B20_Start(void) 
+{   						               
+    DS18B20_Rst();	   
+	DS18B20_Check();	 
+    DS18B20_Write_Byte(0xcc);// skip rom
+    DS18B20_Write_Byte(0x44);// convert
+} 
+
 
 
 
