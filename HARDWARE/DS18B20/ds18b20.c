@@ -101,6 +101,16 @@ void DS18B20_Start(void)
 } 
 
 
+//初始化DS18B20的IO口 DQ 同时检测DS的存在
+//返回1:不存在
+//返回0:存在    	 
+u8 DS18B20_Init(void)
+{
+	RCC->AHB1ENR|=1<<6;    //使能PORTG时钟	   	  
+	GPIO_Set(GPIOG,PIN9,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PG9设置 
+ 	DS18B20_Rst();
+	return DS18B20_Check();
+}  
 
 
 
