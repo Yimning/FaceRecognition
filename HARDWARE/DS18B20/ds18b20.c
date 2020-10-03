@@ -34,6 +34,24 @@ u8 DS18B20_Check(void)
 	return 0;
 }
 
+//从DS18B20读取一个位
+//返回值：1/0
+u8 DS18B20_Read_Bit(void) 			  
+{
+    u8 data;
+	DS18B20_IO_OUT();//SET PG11 OUTPUT
+    DS18B20_DQ_OUT=0; 
+	delay_us(2);
+    DS18B20_DQ_OUT=1; 
+	DS18B20_IO_IN();//SET PG11 INPUT
+	delay_us(12);
+	if(DS18B20_DQ_IN)data=1;
+    else data=0;	 
+    delay_us(50);           
+    return data;
+}
+
+
 
 
 
