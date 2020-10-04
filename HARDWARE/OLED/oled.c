@@ -49,6 +49,57 @@ void OLED_Data_Out(u8 data)
 	PEout(5)=(data>>6)&0X01;	//D6
 	PEout(6)=(data>>7)&0X01;	//D7 
 } 
+//向SSD1306写入一个字节。
+//dat:要写入的数据/命令
+//cmd:数据/命令标志 0,表示命令;1,表示数据;
+void OLED_WR_Byte(u8 dat,u8 cmd)
+{
+	OLED_Data_Out(dat);	    
+ 	OLED_RS=cmd;
+	OLED_CS=0;	   
+	OLED_WR=0;	 
+	OLED_WR=1;
+	OLED_CS=1;	  
+	OLED_RS=1;	 
+} 	    	    
+#else
+//向SSD1306写入一个字节。
+//dat:要写入的数据/命令
+//cmd:数据/命令标志 0,表示命令;1,表示数据;
+void OLED_WR_Byte(u8 dat,u8 cmd)
+{	
+	u8 i;			  
+	OLED_RS=cmd; //写命令 
+	OLED_CS=0;		  
+	for(i=0;i<8;i++)
+	{			  
+		OLED_SCLK=0;
+		if(dat&0x80)OLED_SDIN=1;
+		else OLED_SDIN=0;
+		OLED_SCLK=1;
+		dat<<=1;   
+	}				 
+	OLED_CS=1;		  
+	OLED_RS=1;   	  
+} 
+#endif
+	  	  
+//开启OLED显示    
+void OLED_Display_On(void)
+{
+	OLED_WR_Byte(0X8D,OLED_CMD);  //SET DCDC命令
+	OLED_WR_Byte(0X14,OLED_CMD);  //DCDC ON
+	OLED_WR_Byte(0XAF,OLED_CMD);  //DISPLAY ON
+}
+//关闭OLED显示     
+void OLED_Display_Off(void)
+{
+	OLED_WR_Byte(0X8D,OLED_CMD);  //SET DCDC命令
+	OLED_WR_Byte(0X10,OLED_CMD);  //DCDC OFF
+	OLED_WR_Byte(0XAE,OLED_CMD);  //DISPLAY OFF
+}		   			 
+
+
 
 
 
