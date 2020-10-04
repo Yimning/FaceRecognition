@@ -99,6 +99,76 @@ void OLED_Display_Off(void)
 	OLED_WR_Byte(0XAE,OLED_CMD);  //DISPLAY OFF
 }		   			 
 
+//清屏函数,清完屏,整个屏幕是黑色的!和没点亮一样!!!	  
+void OLED_Clear(void)  
+{  
+	u8 i,n;  
+	for(i=0;i<8;i++)for(n=0;n<128;n++)OLED_GRAM[n][i]=0X00;  
+	OLED_Refresh_Gram();//更新显示
+}
+//画点 
+//x:0~127
+//y:0~63
+//t:1 填充 0,清空				   
+void OLED_DrawPoint(u8 x,u8 y,u8 t)
+{
+	u8 pos,bx,temp=0;
+	if(x>127||y>63)return;//超出范围了.
+	pos=7-y/8;
+	bx=y%8;
+	temp=1<<(7-bx);
+	if(t)OLED_GRAM[x][pos]|=temp;
+	else OLED_GRAM[x][pos]&=~temp;	    
+}
+//x1,y1,x2,y2 填充区域的对角坐标
+//确保x1<=x2;y1<=y2 0<=x1<=127 0<=y1<=63	 	 
+//dot:0,清空;1,填充	  
+void OLED_Fill(u8 x1,u8 y1,u8 x2,u8 y2,u8 dot)  
+{  
+	u8 x,y;  
+	for(x=x1;x<=x2;x++)
+	{
+		for(y=y1;y<=y2;y++)OLED_DrawPoint(x,y,dot);
+	}													    
+	OLED_Refresh_Gram();//更新显示
+}
+//在指定位置显示一个字符,包括部分字符
+//x:0~127
+//y:0~63
+//mode:0,反白显示;1,正常显示				 
+//size:选择字体 12/16/24
+void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 size,u8 mode)
+{      			    
+	u8 temp,t,t1;
+	u8 y0=y;
+	u8 csize=(size/8+((size%8)?1:0))*(size/2);		//得到字体一个字符对应点阵集所占的字节数
+	chr=chr-' ';//得到偏移后的值		 
+    for(t=0;t<csize;t++)
+    {   
+		if(size==12)temp=asc2_1206[chr][t]; 	 	//调用1206字体
+		else if(size==16)temp=asc2_1608[chr][t];	//调用1608字体
+		else if(size==24)temp=asc2_2412[chr][t];	//调用2412字体
+		else return;								//没有的字库
+        for(t1=0;t1<8;t1++)
+		{
+			if(temp&0x80)OLED_DrawPoint(x,y,mode);
+			else OLED_DrawPoint(x,y,!mode);
+			temp<<=1;
+			y++;
+			if((y-y0)==size)
+			{
+				y=y0;
+				x++;
+				break;
+			}
+		}  	 
+    }          
+}
+
+
+
+
+
 
 
 
