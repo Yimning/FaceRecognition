@@ -165,6 +165,55 @@ void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 size,u8 mode)
     }          
 }
 
+//m^n函数
+u32 mypow(u8 m,u8 n)
+{
+	u32 result=1;	 
+	while(n--)result*=m;    
+	return result;
+}				  
+//显示2个数字
+//x,y :起点坐标	 
+//len :数字的位数
+//size:字体大小
+//mode:模式	0,填充模式;1,叠加模式
+//num:数值(0~4294967295);	 		  
+void OLED_ShowNum(u8 x,u8 y,u32 num,u8 len,u8 size)
+{         	
+	u8 t,temp;
+	u8 enshow=0;						   
+	for(t=0;t<len;t++)
+	{
+		temp=(num/mypow(10,len-t-1))%10;
+		if(enshow==0&&t<(len-1))
+		{
+			if(temp==0)
+			{
+				OLED_ShowChar(x+(size/2)*t,y,' ',size,1);
+				continue;
+			}else enshow=1; 
+		 	 
+		}
+	 	OLED_ShowChar(x+(size/2)*t,y,temp+'0',size,1); 
+	}
+} 
+//显示字符串
+//x,y:起点坐标  
+//size:字体大小 
+//*p:字符串起始地址 
+void OLED_ShowString(u8 x,u8 y,const u8 *p,u8 size)
+{	
+    while((*p<='~')&&(*p>=' '))//判断是不是非法字符!
+    {       
+        if(x>(128-(size/2))){x=0;y+=size;}
+        if(y>(64-size)){y=x=0;OLED_Clear();}
+        OLED_ShowChar(x,y,*p,size,1);	 
+        x+=size/2;
+        p++;
+    }  
+	
+}	
+
 
 
 
