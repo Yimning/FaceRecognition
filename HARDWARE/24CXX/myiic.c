@@ -64,6 +64,19 @@ void IIC_Ack(void)
 	IIC_SCL=0;
 }
 
+//不产生ACK应答		    
+void IIC_NAck(void)
+{
+	IIC_SCL=0;
+	SDA_OUT();
+	IIC_SDA=1;
+	delay_us(2);
+	IIC_SCL=1;
+	delay_us(2);
+	IIC_SCL=0;
+}					 				     
+
+
 
 
 
