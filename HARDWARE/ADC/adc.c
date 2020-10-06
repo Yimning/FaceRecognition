@@ -124,7 +124,9 @@ u16 Get_Adc3(u8 ch)
   //设置转换序列	  		 
   ADC3->SQR3&=0XFFFFFFE0;//规则序列1 通道ch
   ADC3->SQR3|=ch;		  			    
-
+  ADC3->CR2|=1<<30;       //启动规则转换通道 
+  while(!(ADC3->SR&1<<1));//等待转换结束	 	   
+  return ADC3->DR;		//返回adc值	
 } 
 
 
