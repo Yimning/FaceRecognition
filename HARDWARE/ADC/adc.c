@@ -121,6 +121,9 @@ void  Adc3_Init(void)
 
 u16 Get_Adc3(u8 ch)   
 {
+  //设置转换序列	  		 
+  ADC3->SQR3&=0XFFFFFFE0;//规则序列1 通道ch
+  ADC3->SQR3|=ch;		  			    
 
 } 
 
