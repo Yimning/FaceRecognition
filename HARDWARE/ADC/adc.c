@@ -73,5 +73,22 @@ u16 Get_Adc_Average(u8 ch,u8 times)
 	return temp_val/times;
 }  
 
+//得到温度值
+//返回值:温度值(扩大了100倍,单位:℃.)
+short Get_Temprate(void)
+{
+	u32 adcx;
+	short result;
+ 	double temperate;
+	adcx=Get_Adc_Average(ADC_CH_TEMP,20);	//读取通道16,20次取平均
+	temperate=(float)adcx*(3.3/4096);		//电压值
+	temperate=(temperate-0.76)/0.0025+25; 	//转换为温度值 
+	result=temperate*=100;					//扩大100倍.
+	return result;
+}
+
+
+
+
 
 
