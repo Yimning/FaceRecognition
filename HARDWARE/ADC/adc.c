@@ -119,6 +119,11 @@ void  Adc3_Init(void)
 //ch:通道值 0~16
 //返回值:转换结果
 
+u16 Get_Adc3(u8 ch)   
+{
+
+} 
+
 
 
 
