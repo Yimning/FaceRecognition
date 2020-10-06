@@ -57,6 +57,22 @@ u16 Get_Adc(u8 ch)
 	return ADC1->DR;		//返回adc值	
 }
 
+//获取通道ch的转换值，取times次,然后平均 
+//ch:通道编号
+//times:获取次数
+//返回值:通道ch的times次转换结果平均值
+u16 Get_Adc_Average(u8 ch,u8 times)
+{
+	u32 temp_val=0;
+	u8 t;
+	for(t=0;t<times;t++)
+	{
+		temp_val+=Get_Adc(ch);
+		delay_ms(5);
+	}
+	return temp_val/times;
+}  
+
 
 
 
