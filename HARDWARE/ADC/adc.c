@@ -44,9 +44,18 @@ void  Adc_Init(void)
  	ADC1->CR2|=1<<0;	   	//开启AD转换器	  
 }					  
 
-
-
-
+//获得ADC值
+//ch:通道值 0~16
+//返回值:转换结果
+u16 Get_Adc(u8 ch)   
+{
+	//设置转换序列	  		 
+	ADC1->SQR3&=0XFFFFFFE0;//规则序列1 通道ch
+	ADC1->SQR3|=ch;		  			    
+	ADC1->CR2|=1<<30;       //启动规则转换通道 
+	while(!(ADC1->SR&1<<1));//等待转换结束	 	   
+	return ADC1->DR;		//返回adc值	
+}
 
 
 
