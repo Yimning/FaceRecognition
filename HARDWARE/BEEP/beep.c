@@ -6,8 +6,15 @@
 void BEEP_Init(void)
 {    	 
 	RCC->AHB1ENR|=1<<5;    		//使能PORTF时钟 
+	GPIO_Set(GPIOF,PIN8,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PD); //PF8设置,下拉
 
 }
+
+
+
+
+
+
 
 
 
