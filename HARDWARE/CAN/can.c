@@ -81,4 +81,118 @@ u8 CAN1_Mode_Init(u8 tsjw,u8 tbs2,u8 tbs1,u16 brp,u8 mode)
 	return 0;
 }   
 
+//id:标准ID(11位)/扩展ID(11位+18位)	    
+//ide:0,标准帧;1,扩展帧
+//rtr:0,数据帧;1,远程帧
+//len:要发送的数据长度(固定为8个字节,在时间触发模式下,有效数据为6个字节)
+//*dat:数据指针.
+//返回值:0~3,邮箱编号.0XFF,无有效邮箱.
+u8 CAN1_Tx_Msg(u32 id,u8 ide,u8 rtr,u8 len,u8 *dat)
+{	   
+	u8 mbox;	  
+	if(CAN1->TSR&(1<<26))mbox=0;			//邮箱0为空
+	else if(CAN1->TSR&(1<<27))mbox=1;	//邮箱1为空
+	else if(CAN1->TSR&(1<<28))mbox=2;	//邮箱2为空
+	else return 0XFF;					//无空邮箱,无法发送 
+	CAN1->sTxMailBox[mbox].TIR=0;		//清除之前的设置
+	if(ide==0)	//标准帧
+	{
+		id&=0x7ff;//取低11位stdid
+		id<<=21;		  
+	}else		//扩展帧
+	{
+		id&=0X1FFFFFFF;//取低32位extid
+		id<<=3;									   
+	}
+	CAN1->sTxMailBox[mbox].TIR|=id;		 
+	CAN1->sTxMailBox[mbox].TIR|=ide<<2;	  
+	CAN1->sTxMailBox[mbox].TIR|=rtr<<1;
+	len&=0X0F;//得到低四位
+	CAN1->sTxMailBox[mbox].TDTR&=~(0X0000000F);
+	CAN1->sTxMailBox[mbox].TDTR|=len;		   //设置DLC.
+	//待发送数据存入邮箱.
+	CAN1->sTxMailBox[mbox].TDHR=(((u32)dat[7]<<24)|
+								((u32)dat[6]<<16)|
+ 								((u32)dat[5]<<8)|
+								((u32)dat[4]));
+	CAN1->sTxMailBox[mbox].TDLR=(((u32)dat[3]<<24)|
+								((u32)dat[2]<<16)|
+ 								((u32)dat[1]<<8)|
+								((u32)dat[0]));
+	CAN1->sTxMailBox[mbox].TIR|=1<<0; //请求发送邮箱数据
+	return mbox;
+}
+//获得发送状态.
+//mbox:邮箱编号;
+//返回值:发送状态. 0,挂起;0X05,发送失败;0X07,发送成功.
+u8 CAN1_Tx_Staus(u8 mbox)
+{	
+	u8 sta=0;					    
+	switch (mbox)
+	{
+		case 0: 
+			sta |= CAN1->TSR&(1<<0);			//RQCP0
+			sta |= CAN1->TSR&(1<<1);			//TXOK0
+			sta |=((CAN1->TSR&(1<<26))>>24);	//TME0
+			break;
+		case 1: 
+			sta |= CAN1->TSR&(1<<8)>>8;		//RQCP1
+			sta |= CAN1->TSR&(1<<9)>>8;		//TXOK1
+			sta |=((CAN1->TSR&(1<<27))>>25);	//TME1	   
+			break;
+		case 2: 
+			sta |= CAN1->TSR&(1<<16)>>16;	//RQCP2
+			sta |= CAN1->TSR&(1<<17)>>16;	//TXOK2
+			sta |=((CAN1->TSR&(1<<28))>>26);	//TME2
+			break;
+		default:
+			sta=0X05;//邮箱号不对,肯定失败.
+		break;
+	}
+	return sta;
+} 
+//得到在FIFO0/FIFO1中接收到的报文个数.
+//fifox:0/1.FIFO编号;
+//返回值:FIFO0/FIFO1中的报文个数.
+u8 CAN1_Msg_Pend(u8 fifox)
+{
+	if(fifox==0)return CAN1->RF0R&0x03; 
+	else if(fifox==1)return CAN1->RF1R&0x03; 
+	else return 0;
+}
+//接收数据
+//fifox:邮箱号
+//id:标准ID(11位)/扩展ID(11位+18位)	    
+//ide:0,标准帧;1,扩展帧
+//rtr:0,数据帧;1,远程帧
+//len:接收到的数据长度(固定为8个字节,在时间触发模式下,有效数据为6个字节)
+//dat:数据缓存区
+void CAN1_Rx_Msg(u8 fifox,u32 *id,u8 *ide,u8 *rtr,u8 *len,u8 *dat)
+{	   
+	*ide=CAN1->sFIFOMailBox[fifox].RIR&0x04;//得到标识符选择位的值  
+ 	if(*ide==0)//标准标识符
+	{
+		*id=CAN1->sFIFOMailBox[fifox].RIR>>21;
+	}else	   //扩展标识符
+	{
+		*id=CAN1->sFIFOMailBox[fifox].RIR>>3;
+	}
+	*rtr=CAN1->sFIFOMailBox[fifox].RIR&0x02;	//得到远程发送请求值.
+	*len=CAN1->sFIFOMailBox[fifox].RDTR&0x0F;//得到DLC
+ 	//*fmi=(CAN1->sFIFOMailBox[FIFONumber].RDTR>>8)&0xFF;//得到FMI
+	//接收数据
+	dat[0]=CAN1->sFIFOMailBox[fifox].RDLR&0XFF;
+	dat[1]=(CAN1->sFIFOMailBox[fifox].RDLR>>8)&0XFF;
+	dat[2]=(CAN1->sFIFOMailBox[fifox].RDLR>>16)&0XFF;
+	dat[3]=(CAN1->sFIFOMailBox[fifox].RDLR>>24)&0XFF;    
+	dat[4]=CAN1->sFIFOMailBox[fifox].RDHR&0XFF;
+	dat[5]=(CAN1->sFIFOMailBox[fifox].RDHR>>8)&0XFF;
+	dat[6]=(CAN1->sFIFOMailBox[fifox].RDHR>>16)&0XFF;
+	dat[7]=(CAN1->sFIFOMailBox[fifox].RDHR>>24)&0XFF;    
+  	if(fifox==0)CAN1->RF0R|=0X20;//释放FIFO0邮箱
+	else if(fifox==1)CAN1->RF1R|=0X20;//释放FIFO1邮箱	 
+}
+
+
+
 
