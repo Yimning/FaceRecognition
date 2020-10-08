@@ -233,7 +233,19 @@ u8 CAN1_Send_Msg(u8* msg,u8 len)
 }
 
 
-
+//can口接收数据查询
+//buf:数据缓存区;	 
+//返回值:0,无数据被收到;
+//		 其他,接收的数据长度;
+u8 CAN1_Receive_Msg(u8 *buf)
+{		   		   
+	u32 id;
+	u8 ide,rtr,len; 
+	if(CAN1_Msg_Pend(0)==0)return 0;		//没有接收到数据,直接退出 	 
+  	CAN1_Rx_Msg(0,&id,&ide,&rtr,&len,buf); 	//读取数据
+    if(id!=0x12||ide!=0||rtr!=0)len=0;		//接收错误	   
+	return len;	
+}
 
 
 
