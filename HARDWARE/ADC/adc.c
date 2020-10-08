@@ -1,5 +1,5 @@
 #include "adc.h"
-#include "delay.h"		 
+#include "delay.h"		  
 
 //1,修改Adc_Init函数,支持内部温度传感器数据采集.
 //2,新增Get_Temprate函数,用于获取内部温度传感器采集到的温度值
