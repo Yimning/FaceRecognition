@@ -73,5 +73,12 @@ u8 CAN1_Mode_Init(u8 tsjw,u8 tbs2,u8 tbs1,u16 brp,u8 mode)
 	CAN1->FA1R|=1<<0;		//激活过滤器0
 	CAN1->FMR&=0<<0;		//过滤器组进入正常模式
 
+#if CAN1_RX0_INT_ENABLE
+ 	//使用中断接收
+	CAN1->IER|=1<<1;		//FIFO0消息挂号中断允许.	    
+	MY_NVIC_Init(1,0,CAN1_RX0_IRQn,2);//组2
+#endif
+	return 0;
+}   
 
 
