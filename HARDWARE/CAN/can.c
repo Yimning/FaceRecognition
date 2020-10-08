@@ -226,7 +226,7 @@ u8 CAN1_Send_Msg(u8* msg,u8 len)
 {	
 	u8 mbox;
 	u16 i=0;	  	 						       
-    mbox=CAN1_Tx_Msg(0X12,0,0,len,msg);
+        mbox=CAN1_Tx_Msg(0X12,0,0,len,msg);
 	while((CAN1_Tx_Staus(mbox)!=0X07)&&(i<0XFFF))i++;//等待发送结束
 	if(i>=0XFFF)return 1;							//发送失败?
 	return 0;										//发送成功;
