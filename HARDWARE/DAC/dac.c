@@ -11,6 +11,9 @@ void Dac1_Init(void)
 
 	DAC->CR|=1<<0;	//使能DAC1
 	DAC->CR|=1<<1;	//DAC1输出缓存不使能 BOFF1=1
+	DAC->CR|=0<<2;	//不使用触发功能 TEN1=0
+	DAC->CR|=0<<3;	//DAC TIM6 TRGO,不过要TEN1=1才行
+	DAC->CR|=0<<6;	//不使用波形发生
 
 }
 
