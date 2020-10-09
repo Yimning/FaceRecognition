@@ -24,9 +24,10 @@ void Dac1_Init(void)
 //vol:0~3300,代表0~3.3V
 void Dac1_Set_Vol(u16 vol)
 {
-   double temp=vol;
-   temp/=1000;
-
+       double temp=vol;
+       temp/=1000;
+       temp=temp*4096/3.3;
+       DAC->DHR12R1=temp;
 }
 
 
