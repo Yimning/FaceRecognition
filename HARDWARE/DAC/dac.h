@@ -2,20 +2,13 @@
 #define __DAC_H	 
 #include "sys.h"	     			    
 //////////////////////////////////////////////////////////////////////////////////	 
-//±¾³ÌÐòÖ»¹©Ñ§Ï°Ê¹ÓÃ£¬Î´¾­×÷ÕßÐí¿É£¬²»µÃÓÃÓÚÆäËüÈÎºÎÓÃÍ¾
-//ALIENTEK STM32F407¿ª·¢°å
-//DAC Çý¶¯´úÂë	   
-//ÕýµãÔ­×Ó@ALIENTEK
-//¼¼ÊõÂÛÌ³:www.openedv.com
-//´´½¨ÈÕÆÚ:2014/5/7
-//°æ±¾£ºV1.0
-//°æÈ¨ËùÓÐ£¬µÁ°æ±Ø¾¿¡£
-//Copyright(C) ¹ãÖÝÊÐÐÇÒíµç×Ó¿Æ¼¼ÓÐÏÞ¹«Ë¾ 2014-2024
-//All rights reserved 
+//ALIENTEK STM32F407å¼€å‘æ¿
+//DAC é©±åŠ¨ä»£ç 	   
+//æŠ€æœ¯è®ºå›:www.openedv.com
 ////////////////////////////////////////////////////////////////////////////////// 	
  
-void Dac1_Init(void);		//DACÍ¨µÀ1³õÊ¼»¯	 	 
-void Dac1_Set_Vol(u16 vol);	//ÉèÖÃÍ¨µÀ1Êä³öµçÑ¹
+void Dac1_Init(void);		//DACé€šé“1åˆå§‹åŒ–	 	 
+void Dac1_Set_Vol(u16 vol);	//è®¾ç½®é€šé“1è¾“å‡ºç”µåŽ‹
 #endif
 
 
