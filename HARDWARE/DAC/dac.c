@@ -14,6 +14,9 @@ void Dac1_Init(void)
 	DAC->CR|=0<<2;	//不使用触发功能 TEN1=0
 	DAC->CR|=0<<3;	//DAC TIM6 TRGO,不过要TEN1=1才行
 	DAC->CR|=0<<6;	//不使用波形发生
+	DAC->CR|=0<<8;	//屏蔽、幅值设置
+	DAC->CR|=0<<12;	//DAC1 DMA不使能    
+	DAC->DHR12R1=0;
 
 }
 
