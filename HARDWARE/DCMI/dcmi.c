@@ -161,6 +161,9 @@ void DCMI_Set_Window(u16 sx,u16 sy,u16 width,u16 height)
 //pclk/hsync/vsync:三个信号的有限电平设置
 void DCMI_CR_Set(u8 pclk,u8 hsync,u8 vsync)
 {
+	DCMI->CR=0;
+	DCMI->CR|=pclk<<5;		//PCLK 有效边沿设置
+	DCMI->CR|=hsync<<6;		//HSYNC 有效电平设置
 
 }
 
