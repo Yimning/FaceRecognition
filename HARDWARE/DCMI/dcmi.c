@@ -131,6 +131,20 @@ void DCMI_Start(void)
 	DCMI->CR|=1<<0; 			//DCMI捕获使能  
 }
 
+//DCMI,关闭传输
+void DCMI_Stop(void)
+{
+	DCMI->CR&=~(1<<0); 			//DCMI捕获关闭   
+	while(DCMI->CR&0X01);		//等待传输结束 
+	DMA2_Stream1->CR&=~(1<<0);	//关闭DMA2,Stream1  	
+} 
+////////////////////////////////////////////////////////////////////////////////
+//以下两个函数,供usmart调用,用于调试代码
+
+//DCMI设置显示窗口
+//sx,sy;LCD的起始坐标
+//width,height:LCD显示范围.
+
 
 
 
