@@ -144,7 +144,17 @@ void DCMI_Stop(void)
 //DCMI设置显示窗口
 //sx,sy;LCD的起始坐标
 //width,height:LCD显示范围.
-
+void DCMI_Set_Window(u16 sx,u16 sy,u16 width,u16 height)
+{
+	DCMI_Stop(); 
+	LCD_Clear(WHITE);
+	LCD_Set_Window(sx,sy,width,height);
+	OV2640_OutSize_Set(width,height);
+  	LCD_SetCursor(0,0);  
+	LCD_WriteRAM_Prepare();		//开始写入GRAM
+	DMA2_Stream1->CR|=1<<0;		//开启DMA2,Stream1 
+	DCMI->CR|=1<<0; 			//DCMI捕获使能  
+}
 
 
 
