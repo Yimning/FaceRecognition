@@ -122,6 +122,17 @@ void DCMI_Init(void)
 	MY_NVIC_Init(0,0,DCMI_IRQn,2);	//抢占1，子优先级2，组2 
 } 
 extern u16 face_offx,face_offy;
+//DCMI,启动传输
+void DCMI_Start(void)
+{  
+  	LCD_SetCursor(face_offx,face_offy);  
+	LCD_WriteRAM_Prepare();		//开始写入GRAM
+	DMA2_Stream1->CR|=1<<0;		//开启DMA2,Stream1 
+	DCMI->CR|=1<<0; 			//DCMI捕获使能  
+}
+
+
+
 
 
 
