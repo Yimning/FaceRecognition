@@ -156,6 +156,10 @@ void DCMI_Set_Window(u16 sx,u16 sy,u16 width,u16 height)
 	DCMI->CR|=1<<0; 			//DCMI捕获使能  
 }
 
+   
+//通过usmart调试,辅助测试用.
+//pclk/hsync/vsync:三个信号的有限电平设置
+
 
 
 
