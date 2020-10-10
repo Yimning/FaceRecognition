@@ -64,6 +64,8 @@ void DCMI_DMA_Init(u32 mem0addr,u32 mem1addr,u16 memsize,u8 memblen,u8 meminc)
 	}
 }   
 
+void (*dcmi_rx_callback)(void);//DCMI DMA接收回调函数
+
 
 
 
