@@ -15,6 +15,20 @@
 //////////////////////////////////////////////////////////////////////////////////	 
 
 
+u8 ov_frame=0;  						//帧率
+extern void jpeg_data_process(void);	//JPEG数据处理函数
+//DCMI中断服务函数
+void DCMI_IRQHandler(void)
+{  
+	if(DCMI->MISR&0X01)//捕获到一帧图像
+	{
+		jpeg_data_process();//jpeg数据处理
+		DCMI->ICR|=1<<0;	//清除帧中断
+		LED1=!LED1;
+		ov_frame++;  
+	}										 
+} 
+
 
 
 
