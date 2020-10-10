@@ -65,8 +65,12 @@ void DCMI_DMA_Init(u32 mem0addr,u32 mem1addr,u16 memsize,u8 memblen,u8 meminc)
 }   
 
 void (*dcmi_rx_callback)(void);//DCMI DMA接收回调函数
-
-
-
-
-
+//DMA2_Stream1中断服务函数(仅双缓冲模式会用到)
+void DMA2_Stream1_IRQHandler(void)
+{        
+	if(DMA2->LISR&(1<<11))	//DMA2_Steam1,传输完成标志
+	{ 
+		DMA2->LIFCR|=1<<11;	//清除传输完成中断
+      	dcmi_rx_callback();	//执行摄像头接收回调函数,读取数据等操作在这里面处理  
+	}    											 
+}  
