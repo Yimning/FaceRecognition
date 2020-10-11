@@ -58,6 +58,7 @@ void MYDMA_Config(DMA_Stream_TypeDef *DMA_Streamx,u8 chx,u32 par,u32 mar,u16 ndt
 //ndtr:数据传输量  
 void MYDMA_Enable(DMA_Stream_TypeDef *DMA_Streamx,u16 ndtr)
 {
+	DMA_Streamx->CR&=~(1<<0); 	//关闭DMA传输 
 
 }	  
 
