@@ -55,6 +55,11 @@ void MYDMA_Config(DMA_Stream_TypeDef *DMA_Streamx,u8 chx,u32 par,u32 mar,u16 ndt
 } 
 //开启一次DMA传输
 //DMA_Streamx:DMA数据流,DMA1_Stream0~7/DMA2_Stream0~7 
+//ndtr:数据传输量  
+void MYDMA_Enable(DMA_Stream_TypeDef *DMA_Streamx,u16 ndtr)
+{
+
+}	  
 
  
 
