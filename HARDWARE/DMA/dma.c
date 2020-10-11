@@ -30,6 +30,16 @@ void MYDMA_Config(DMA_Stream_TypeDef *DMA_Streamx,u8 chx,u32 par,u32 mar,u16 ndt
 		DMAx=DMA1; 
  		RCC->AHB1ENR|=1<<21;//DMA1时钟使能 
 	}
+	while(DMA_Streamx->CR&0X01);//等待DMA可配置 
+	streamx=(((u32)DMA_Streamx-(u32)DMAx)-0X10)/0X18;		//得到stream通道号
+ 	if(streamx>=6)DMAx->HIFCR|=0X3D<<(6*(streamx-6)+16);	//清空之前该stream上的所有中断标志
+	else if(streamx>=4)DMAx->HIFCR|=0X3D<<6*(streamx-4);    //清空之前该stream上的所有中断标志
+	else if(streamx>=2)DMAx->LIFCR|=0X3D<<(6*(streamx-2)+16);//清空之前该stream上的所有中断标志
+	else DMAx->LIFCR|=0X3D<<6*streamx;						//清空之前该stream上的所有中断标志
+	
+
+
+
 
 
 
