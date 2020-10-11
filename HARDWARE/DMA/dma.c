@@ -60,7 +60,8 @@ void MYDMA_Enable(DMA_Stream_TypeDef *DMA_Streamx,u16 ndtr)
 {
 	DMA_Streamx->CR&=~(1<<0); 	//关闭DMA传输 
 	while(DMA_Streamx->CR&0X1);	//确保DMA可以被设置  
-
+	DMA_Streamx->NDTR=ndtr;		//DMA 存储器0地址 
+	DMA_Streamx->CR|=1<<0;		//开启DMA传输	
 
 }	  
 
