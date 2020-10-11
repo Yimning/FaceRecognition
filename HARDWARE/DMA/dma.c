@@ -53,6 +53,17 @@ void MYDMA_Config(DMA_Stream_TypeDef *DMA_Streamx,u8 chx,u32 par,u32 mar,u16 ndt
 	DMA_Streamx->CR|=(u32)chx<<25;//通道选择
 	//DMA_Streamx->FCR=0X21;	//FIFO控制寄存器
 } 
+//开启一次DMA传输
+
+ 
+
+	
+
+
+
+
+
+
 
 
 
