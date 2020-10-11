@@ -36,13 +36,23 @@ void MYDMA_Config(DMA_Stream_TypeDef *DMA_Streamx,u8 chx,u32 par,u32 mar,u16 ndt
 	else if(streamx>=4)DMAx->HIFCR|=0X3D<<6*(streamx-4);    //清空之前该stream上的所有中断标志
 	else if(streamx>=2)DMAx->LIFCR|=0X3D<<(6*(streamx-2)+16);//清空之前该stream上的所有中断标志
 	else DMAx->LIFCR|=0X3D<<6*streamx;						//清空之前该stream上的所有中断标志
+	DMA_Streamx->PAR=par;		//DMA外设地址
+	DMA_Streamx->M0AR=mar;		//DMA 存储器0地址
+	DMA_Streamx->NDTR=ndtr;		//DMA 存储器0地址
+	DMA_Streamx->CR=0;			//先全部复位CR寄存器值 
 	
-
-
-
-
-
-
+	DMA_Streamx->CR|=1<<6;		//存储器到外设模式
+	DMA_Streamx->CR|=0<<8;		//非循环模式(即使用普通模式)
+	DMA_Streamx->CR|=0<<9;		//外设非增量模式
+	DMA_Streamx->CR|=1<<10;		//存储器增量模式
+	DMA_Streamx->CR|=0<<11;		//外设数据长度:8位
+	DMA_Streamx->CR|=0<<13;		//存储器数据长度:8位
+	DMA_Streamx->CR|=1<<16;		//中等优先级
+	DMA_Streamx->CR|=0<<21;		//外设突发单次传输
+	DMA_Streamx->CR|=0<<23;		//存储器突发单次传输
+	DMA_Streamx->CR|=(u32)chx<<25;//通道选择
+	//DMA_Streamx->FCR=0X21;	//FIFO控制寄存器
+} 
 
 
 
