@@ -17,6 +17,20 @@
 //par:外设地址
 //mar:存储器地址
 //ndtr:数据传输量  
+void MYDMA_Config(DMA_Stream_TypeDef *DMA_Streamx,u8 chx,u32 par,u32 mar,u16 ndtr)
+{ 
+	DMA_TypeDef *DMAx;
+	u8 streamx;
+	if((u32)DMA_Streamx>(u32)DMA2)//得到当前stream是属于DMA2还是DMA1
+	{
+		DMAx=DMA2;
+		RCC->AHB1ENR|=1<<22;//DMA2时钟使能 
+	}else 
+	{
+		DMAx=DMA1; 
+ 		RCC->AHB1ENR|=1<<21;//DMA1时钟使能 
+	}
+
 
 
 
