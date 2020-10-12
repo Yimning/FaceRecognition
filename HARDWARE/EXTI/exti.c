@@ -66,6 +66,8 @@ void EXTIX_Init(void)
 	KEY_Init(); 
 	Ex_NVIC_Config(GPIO_E,2,FTIR); 		//下降沿触发
 	Ex_NVIC_Config(GPIO_E,3,FTIR); 		//下降沿触发
+	Ex_NVIC_Config(GPIO_E,4,FTIR); 		//下降沿触发
+ 	Ex_NVIC_Config(GPIO_A,0,RTIR); 	 	//上升沿触发 
 
 }
 
