@@ -64,7 +64,10 @@ void EXTI4_IRQHandler(void)
 void EXTIX_Init(void)
 {
 	KEY_Init(); 
+	Ex_NVIC_Config(GPIO_E,2,FTIR); 		//下降沿触发
+	Ex_NVIC_Config(GPIO_E,3,FTIR); 		//下降沿触发
 
+}
 
 
 
