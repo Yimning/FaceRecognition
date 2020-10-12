@@ -63,8 +63,8 @@ void EXTI4_IRQHandler(void)
 //初始化PE2~4,PA0为中断输入.
 void EXTIX_Init(void)
 {
+	KEY_Init(); 
 
-}
 
 
 
