@@ -24,5 +24,17 @@ void EXTI0_IRQHandler(void)
 	EXTI->PR=1<<0;  //清除LINE0上的中断标志位  
 }	
 
+//外部中断2服务程序
+void EXTI2_IRQHandler(void)
+{
+	delay_ms(10);	//消抖
+	if(KEY2==0)	  
+	{	 
+		LED0=!LED0; 			 
+	}		 
+	EXTI->PR=1<<2;  //清除LINE2上的中断标志位  
+}
+
+
 
 
