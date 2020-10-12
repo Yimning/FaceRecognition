@@ -58,7 +58,13 @@ void EXTI4_IRQHandler(void)
 	EXTI->PR=1<<4;  //清除LINE4上的中断标志位  
 }
 
+	   
+//外部中断初始化程序
+//初始化PE2~4,PA0为中断输入.
+void EXTIX_Init(void)
+{
 
+}
 
 
 
