@@ -29,6 +29,7 @@ void KEY_Init(void)
 u8 KEY_Scan(u8 mode)
 {	 
 	static u8 key_up=1;//按键按松开标志
+	if(mode)key_up=1;  //支持连按		  
 
 }
 
