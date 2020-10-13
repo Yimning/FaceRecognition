@@ -26,6 +26,17 @@ void KEY_Init(void)
 //3，KEY2按下 
 //4，KEY_UP按下 即WK_UP
 //注意此函数有响应优先级,KEY0>KEY1>KEY2>KEY_UP!!
+u8 KEY_Scan(u8 mode)
+{	 
+
+}
+
+
+
+
+
+
+
 
 
 
