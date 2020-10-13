@@ -36,7 +36,8 @@ u8 KEY_Scan(u8 mode)
 		key_up=0;
 		if(KEY0==0)return 1;
 		else if(KEY1==0)return 2;
-
+		else if(KEY2==0)return 3;
+		else if(WK_UP==1)return 4;
 	}else if(KEY0==1&&KEY1==1&&KEY2==1&&WK_UP==0)key_up=1; 	    
  	return 0;// 无按键按下
 }
