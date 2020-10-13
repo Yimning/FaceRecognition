@@ -32,6 +32,8 @@ u8 KEY_Scan(u8 mode)
 	if(mode)key_up=1;  //支持连按		  
 	if(key_up&&(KEY0==0||KEY1==0||KEY2==0||WK_UP==1))
 	{
+		delay_ms(10);//去抖动 
+		key_up=0;
 
 	}else if(KEY0==1&&KEY1==1&&KEY2==1&&WK_UP==0)key_up=1; 	    
  	return 0;// 无按键按下
