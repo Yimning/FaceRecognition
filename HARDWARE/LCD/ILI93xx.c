@@ -2860,9 +2860,26 @@ void LCD_ShowNum(u16 x,u16 y,u32 num,u8 len,u8 size)
 //[7]:0,不填充;1,填充0.
 //[6:1]:保留
 //[0]:0,非叠加显示;1,叠加显示.
-
-
-
+void LCD_ShowxNum(u16 x,u16 y,u32 num,u8 len,u8 size,u8 mode)
+{  
+	u8 t,temp;
+	u8 enshow=0;						   
+	for(t=0;t<len;t++)
+	{
+		temp=(num/LCD_Pow(10,len-t-1))%10;
+		if(enshow==0&&t<(len-1))
+		{
+			if(temp==0)
+			{
+				if(mode&0X80)LCD_ShowChar(x+(size/2)*t,y,'0',size,mode&0X01);  
+				else LCD_ShowChar(x+(size/2)*t,y,' ',size,mode&0X01);  
+ 				continue;
+			}else enshow=1; 
+		 	 
+		}
+	 	LCD_ShowChar(x+(size/2)*t,y,temp+'0',size,mode&0X01); 
+	}
+} 
 
 
 
