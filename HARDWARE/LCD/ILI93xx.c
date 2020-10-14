@@ -2558,25 +2558,189 @@ void LCD_Init(void)
 		LCD_WriteReg(0X07,0X0023);   
 		LCD_WriteReg(0X07,0X0033);   
 		LCD_WriteReg(0X07,0X0133);   
+	}else if(lcddev.id==0X1963)
+	{
+		LCD_WR_REG(0xE2);		//Set PLL with OSC = 10MHz (hardware),	Multiplier N = 35, 250MHz < VCO < 800MHz = OSC*(N+1), VCO = 300MHz
+		LCD_WR_DATA(0x1D);		//参数1 
+		LCD_WR_DATA(0x02);		//参数2 Divider M = 2, PLL = 300/(M+1) = 100MHz
+		LCD_WR_DATA(0x04);		//参数3 Validate M and N values   
+		delay_us(100);
+		LCD_WR_REG(0xE0);		// Start PLL command
+		LCD_WR_DATA(0x01);		// enable PLL
+		delay_ms(10);
+		LCD_WR_REG(0xE0);		// Start PLL command again
+		LCD_WR_DATA(0x03);		// now, use PLL output as system clock	
+		delay_ms(12);  
+		LCD_WR_REG(0x01);		//软复位
+		delay_ms(10);
+		
+		LCD_WR_REG(0xE6);		//设置像素频率,33Mhz
+		LCD_WR_DATA(0x2F);
+		LCD_WR_DATA(0xFF);
+		LCD_WR_DATA(0xFF);
+		
+		LCD_WR_REG(0xB0);		//设置LCD模式
+		LCD_WR_DATA(0x20);		//24位模式
+		LCD_WR_DATA(0x00);		//TFT 模式 
+	
+		LCD_WR_DATA((SSD_HOR_RESOLUTION-1)>>8);//设置LCD水平像素
+		LCD_WR_DATA(SSD_HOR_RESOLUTION-1);		 
+		LCD_WR_DATA((SSD_VER_RESOLUTION-1)>>8);//设置LCD垂直像素
+		LCD_WR_DATA(SSD_VER_RESOLUTION-1);		 
+		LCD_WR_DATA(0x00);		//RGB序列 
+		
+		LCD_WR_REG(0xB4);		//Set horizontal period
+		LCD_WR_DATA((SSD_HT-1)>>8);
+		LCD_WR_DATA(SSD_HT-1);
+		LCD_WR_DATA(SSD_HPS>>8);
+		LCD_WR_DATA(SSD_HPS);
+		LCD_WR_DATA(SSD_HOR_PULSE_WIDTH-1);
+		LCD_WR_DATA(0x00);
+		LCD_WR_DATA(0x00);
+		LCD_WR_DATA(0x00);
+		LCD_WR_REG(0xB6);		//Set vertical period
+		LCD_WR_DATA((SSD_VT-1)>>8);
+		LCD_WR_DATA(SSD_VT-1);
+		LCD_WR_DATA(SSD_VPS>>8);
+		LCD_WR_DATA(SSD_VPS);
+		LCD_WR_DATA(SSD_VER_FRONT_PORCH-1);
+		LCD_WR_DATA(0x00);
+		LCD_WR_DATA(0x00);
+		
+		LCD_WR_REG(0xF0);	//设置SSD1963与CPU接口为16bit  
+		LCD_WR_DATA(0x03);	//16-bit(565 format) data for 16bpp 
+
+		LCD_WR_REG(0x29);	//开启显示
+		//设置PWM输出  背光通过占空比可调 
+		LCD_WR_REG(0xD0);	//设置自动白平衡DBC
+		LCD_WR_DATA(0x00);	//disable
+	
+		LCD_WR_REG(0xBE);	//配置PWM输出
+		LCD_WR_DATA(0x05);	//1设置PWM频率
+		LCD_WR_DATA(0xFE);	//2设置PWM占空比
+		LCD_WR_DATA(0x01);	//3设置C
+		LCD_WR_DATA(0x00);	//4设置D
+		LCD_WR_DATA(0x00);	//5设置E 
+		LCD_WR_DATA(0x00);	//6设置F 
+		
+		LCD_WR_REG(0xB8);	//设置GPIO配置
+		LCD_WR_DATA(0x03);	//2个IO口设置成输出
+		LCD_WR_DATA(0x01);	//GPIO使用正常的IO功能 
+		LCD_WR_REG(0xBA);
+		LCD_WR_DATA(0X01);	//GPIO[1:0]=01,控制LCD方向
+		
+		LCD_SSD_BackLightSet(100);//背光设置为最亮
+	}		 
+	LCD_Display_Dir(0);		//默认为竖屏
+	LCD_LED=1;				//点亮背光
+	LCD_Clear(WHITE);
+}  
+//清屏函数
+//color:要清屏的填充色
+void LCD_Clear(u16 color)
+{
+	u32 index=0;      
+	u32 totalpoint=lcddev.width;
+	totalpoint*=lcddev.height; 			//得到总点数
+	if((lcddev.id==0X6804)&&(lcddev.dir==1))//6804横屏的时候特殊处理  
+	{						    
+ 		lcddev.dir=0;	 
+ 		lcddev.setxcmd=0X2A;
+		lcddev.setycmd=0X2B;  	 			
+		LCD_SetCursor(0x00,0x0000);		//设置光标位置  
+ 		lcddev.dir=1;	 
+  		lcddev.setxcmd=0X2B;
+		lcddev.setycmd=0X2A;  	 
+ 	}else LCD_SetCursor(0x00,0x0000);	//设置光标位置 
+	LCD_WriteRAM_Prepare();     		//开始写入GRAM	 	  
+	for(index=0;index<totalpoint;index++)
+	{
+		LCD->LCD_RAM=color;	
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}  
+//在指定区域内填充单个颜色
+//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
+//color:要填充的颜色
+void LCD_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 color)
+{          
+	u16 i,j;
+	u16 xlen=0;
+	u16 temp;
+	if((lcddev.id==0X6804)&&(lcddev.dir==1))	//6804横屏的时候特殊处理  
+	{
+		temp=sx;
+		sx=sy;
+		sy=lcddev.width-ex-1;	  
+		ex=ey;
+		ey=lcddev.width-temp-1;
+ 		lcddev.dir=0;	 
+ 		lcddev.setxcmd=0X2A;
+		lcddev.setycmd=0X2B;  	 			
+		LCD_Fill(sx,sy,ex,ey,color);  
+ 		lcddev.dir=1;	 
+  		lcddev.setxcmd=0X2B;
+		lcddev.setycmd=0X2A;  	 
+ 	}else
+	{
+		xlen=ex-sx+1;	 
+		for(i=sy;i<=ey;i++)
+		{
+		 	LCD_SetCursor(sx,i);      				//设置光标位置 
+			LCD_WriteRAM_Prepare();     			//开始写入GRAM	  
+			for(j=0;j<xlen;j++)LCD->LCD_RAM=color;	//显示颜色 	    
+		}
+	}	 
+}  
+//在指定区域内填充指定颜色块			 
+//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
+//color:要填充的颜色
+void LCD_Color_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 *color)
+{  
+	u16 height,width;
+	u16 i,j;
+	width=ex-sx+1; 			//得到填充的宽度
+	height=ey-sy+1;			//高度
+ 	for(i=0;i<height;i++)
+	{
+ 		LCD_SetCursor(sx,sy+i);   	//设置光标位置 
+		LCD_WriteRAM_Prepare();     //开始写入GRAM
+		for(j=0;j<width;j++)LCD->LCD_RAM=color[i*width+j];//写入数据 
+	}		  
+}  
+//画线
+//x1,y1:起点坐标
+//x2,y2:终点坐标  
+void LCD_DrawLine(u16 x1, u16 y1, u16 x2, u16 y2)
+{
+	u16 t; 
+	int xerr=0,yerr=0,delta_x,delta_y,distance; 
+	int incx,incy,uRow,uCol; 
+	delta_x=x2-x1; //计算坐标增量 
+	delta_y=y2-y1; 
+	uRow=x1; 
+	uCol=y1; 
+	if(delta_x>0)incx=1; //设置单步方向 
+	else if(delta_x==0)incx=0;//垂直线 
+	else {incx=-1;delta_x=-delta_x;} 
+	if(delta_y>0)incy=1; 
+	else if(delta_y==0)incy=0;//水平线 
+	else{incy=-1;delta_y=-delta_y;} 
+	if( delta_x>delta_y)distance=delta_x; //选取基本增量坐标轴 
+	else distance=delta_y; 
+	for(t=0;t<=distance+1;t++ )//画线输出 
+	{  
+		LCD_DrawPoint(uRow,uCol);//画点 
+		xerr+=delta_x ; 
+		yerr+=delta_y ; 
+		if(xerr>distance) 
+		{ 
+			xerr-=distance; 
+			uRow+=incx; 
+		} 
+		if(yerr>distance) 
+		{ 
+			yerr-=distance; 
+			uCol+=incy; 
+		} 
+	}  
+}    
