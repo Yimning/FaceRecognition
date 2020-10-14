@@ -2659,88 +2659,27 @@ void LCD_Clear(u16 color)
 	}
 }  
 //在指定区域内填充单个颜色
-//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
-//color:要填充的颜色
-void LCD_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 color)
-{          
-	u16 i,j;
-	u16 xlen=0;
-	u16 temp;
-	if((lcddev.id==0X6804)&&(lcddev.dir==1))	//6804横屏的时候特殊处理  
-	{
-		temp=sx;
-		sx=sy;
-		sy=lcddev.width-ex-1;	  
-		ex=ey;
-		ey=lcddev.width-temp-1;
- 		lcddev.dir=0;	 
- 		lcddev.setxcmd=0X2A;
-		lcddev.setycmd=0X2B;  	 			
-		LCD_Fill(sx,sy,ex,ey,color);  
- 		lcddev.dir=1;	 
-  		lcddev.setxcmd=0X2B;
-		lcddev.setycmd=0X2A;  	 
- 	}else
-	{
-		xlen=ex-sx+1;	 
-		for(i=sy;i<=ey;i++)
-		{
-		 	LCD_SetCursor(sx,i);      				//设置光标位置 
-			LCD_WriteRAM_Prepare();     			//开始写入GRAM	  
-			for(j=0;j<xlen;j++)LCD->LCD_RAM=color;	//显示颜色 	    
-		}
-	}	 
-}  
-//在指定区域内填充指定颜色块			 
-//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
-//color:要填充的颜色
-void LCD_Color_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 *color)
-{  
-	u16 height,width;
-	u16 i,j;
-	width=ex-sx+1; 			//得到填充的宽度
-	height=ey-sy+1;			//高度
- 	for(i=0;i<height;i++)
-	{
- 		LCD_SetCursor(sx,sy+i);   	//设置光标位置 
-		LCD_WriteRAM_Prepare();     //开始写入GRAM
-		for(j=0;j<width;j++)LCD->LCD_RAM=color[i*width+j];//写入数据 
-	}		  
-}  
-//画线
-//x1,y1:起点坐标
-//x2,y2:终点坐标  
-void LCD_DrawLine(u16 x1, u16 y1, u16 x2, u16 y2)
-{
-	u16 t; 
-	int xerr=0,yerr=0,delta_x,delta_y,distance; 
-	int incx,incy,uRow,uCol; 
-	delta_x=x2-x1; //计算坐标增量 
-	delta_y=y2-y1; 
-	uRow=x1; 
-	uCol=y1; 
-	if(delta_x>0)incx=1; //设置单步方向 
-	else if(delta_x==0)incx=0;//垂直线 
-	else {incx=-1;delta_x=-delta_x;} 
-	if(delta_y>0)incy=1; 
-	else if(delta_y==0)incy=0;//水平线 
-	else{incy=-1;delta_y=-delta_y;} 
-	if( delta_x>delta_y)distance=delta_x; //选取基本增量坐标轴 
-	else distance=delta_y; 
-	for(t=0;t<=distance+1;t++ )//画线输出 
-	{  
-		LCD_DrawPoint(uRow,uCol);//画点 
-		xerr+=delta_x ; 
-		yerr+=delta_y ; 
-		if(xerr>distance) 
-		{ 
-			xerr-=distance; 
-			uRow+=incx; 
-		} 
-		if(yerr>distance) 
-		{ 
-			yerr-=distance; 
-			uCol+=incy; 
-		} 
-	}  
-}    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
