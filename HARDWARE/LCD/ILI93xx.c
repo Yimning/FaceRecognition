@@ -2659,6 +2659,176 @@ void LCD_Clear(u16 color)
 	}
 }  
 //在指定区域内填充单个颜色
+//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
+//color:要填充的颜色
+void LCD_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 color)
+{          
+	u16 i,j;
+	u16 xlen=0;
+	u16 temp;
+	if((lcddev.id==0X6804)&&(lcddev.dir==1))	//6804横屏的时候特殊处理  
+	{
+		temp=sx;
+		sx=sy;
+		sy=lcddev.width-ex-1;	  
+		ex=ey;
+		ey=lcddev.width-temp-1;
+ 		lcddev.dir=0;	 
+ 		lcddev.setxcmd=0X2A;
+		lcddev.setycmd=0X2B;  	 			
+		LCD_Fill(sx,sy,ex,ey,color);  
+ 		lcddev.dir=1;	 
+  		lcddev.setxcmd=0X2B;
+		lcddev.setycmd=0X2A;  	 
+ 	}else
+	{
+		xlen=ex-sx+1;	 
+		for(i=sy;i<=ey;i++)
+		{
+		 	LCD_SetCursor(sx,i);      				//设置光标位置 
+			LCD_WriteRAM_Prepare();     			//开始写入GRAM	  
+			for(j=0;j<xlen;j++)LCD->LCD_RAM=color;	//显示颜色 	    
+		}
+	}	 
+}  
+//在指定区域内填充指定颜色块			 
+//(sx,sy),(ex,ey):填充矩形对角坐标,区域大小为:(ex-sx+1)*(ey-sy+1)   
+//color:要填充的颜色
+void LCD_Color_Fill(u16 sx,u16 sy,u16 ex,u16 ey,u16 *color)
+{  
+	u16 height,width;
+	u16 i,j;
+	width=ex-sx+1; 			//得到填充的宽度
+	height=ey-sy+1;			//高度
+ 	for(i=0;i<height;i++)
+	{
+ 		LCD_SetCursor(sx,sy+i);   	//设置光标位置 
+		LCD_WriteRAM_Prepare();     //开始写入GRAM
+		for(j=0;j<width;j++)LCD->LCD_RAM=color[i*width+j];//写入数据 
+	}		  
+}  
+//画线
+//x1,y1:起点坐标
+//x2,y2:终点坐标  
+void LCD_DrawLine(u16 x1, u16 y1, u16 x2, u16 y2)
+{
+	u16 t; 
+	int xerr=0,yerr=0,delta_x,delta_y,distance; 
+	int incx,incy,uRow,uCol; 
+	delta_x=x2-x1; //计算坐标增量 
+	delta_y=y2-y1; 
+	uRow=x1; 
+	uCol=y1; 
+	if(delta_x>0)incx=1; //设置单步方向 
+	else if(delta_x==0)incx=0;//垂直线 
+	else {incx=-1;delta_x=-delta_x;} 
+	if(delta_y>0)incy=1; 
+	else if(delta_y==0)incy=0;//水平线 
+	else{incy=-1;delta_y=-delta_y;} 
+	if( delta_x>delta_y)distance=delta_x; //选取基本增量坐标轴 
+	else distance=delta_y; 
+	for(t=0;t<=distance+1;t++ )//画线输出 
+	{  
+		LCD_DrawPoint(uRow,uCol);//画点 
+		xerr+=delta_x ; 
+		yerr+=delta_y ; 
+		if(xerr>distance) 
+		{ 
+			xerr-=distance; 
+			uRow+=incx; 
+		} 
+		if(yerr>distance) 
+		{ 
+			yerr-=distance; 
+			uCol+=incy; 
+		} 
+	}  
+} 
+//画矩形	  
+//(x1,y1),(x2,y2):矩形的对角坐标
+void LCD_DrawRectangle(u16 x1, u16 y1, u16 x2, u16 y2)
+{
+	LCD_DrawLine(x1,y1,x2,y1);
+	LCD_DrawLine(x1,y1,x1,y2);
+	LCD_DrawLine(x1,y2,x2,y2);
+	LCD_DrawLine(x2,y1,x2,y2);
+}
+//在指定位置画一个指定大小的圆
+//(x,y):中心点
+//r    :半径
+void LCD_Draw_Circle(u16 x0,u16 y0,u8 r)
+{
+	int a,b;
+	int di;
+	a=0;b=r;	  
+	di=3-(r<<1);             //判断下个点位置的标志
+	while(a<=b)
+	{
+		LCD_DrawPoint(x0+a,y0-b);             //5
+ 		LCD_DrawPoint(x0+b,y0-a);             //0           
+		LCD_DrawPoint(x0+b,y0+a);             //4               
+		LCD_DrawPoint(x0+a,y0+b);             //6 
+		LCD_DrawPoint(x0-a,y0+b);             //1       
+ 		LCD_DrawPoint(x0-b,y0+a);             
+		LCD_DrawPoint(x0-a,y0-b);             //2             
+  		LCD_DrawPoint(x0-b,y0-a);             //7     	         
+		a++;
+		//使用Bresenham算法画圆     
+		if(di<0)di +=4*a+6;	  
+		else
+		{
+			di+=10+4*(a-b);   
+			b--;
+		} 						    
+	}
+} 									  
+//在指定位置显示一个字符
+//x,y:起始坐标
+//num:要显示的字符:" "--->"~"
+//size:字体大小 12/16/24
+//mode:叠加方式(1)还是非叠加方式(0)
+void LCD_ShowChar(u16 x,u16 y,u8 num,u8 size,u8 mode)
+{  							  
+    u8 temp,t1,t;
+	u16 y0=y;
+	u8 csize=(size/8+((size%8)?1:0))*(size/2);		//得到字体一个字符对应点阵集所占的字节数	
+ 	num=num-' ';//得到偏移后的值（ASCII字库是从空格开始取模，所以-' '就是对应字符的字库）
+	for(t=0;t<csize;t++)
+	{   
+		if(size==12)temp=asc2_1206[num][t]; 	 	//调用1206字体
+		else if(size==16)temp=asc2_1608[num][t];	//调用1608字体
+		else if(size==24)temp=asc2_2412[num][t];	//调用2412字体
+		else return;								//没有的字库
+		for(t1=0;t1<8;t1++)
+		{			    
+			if(temp&0x80)LCD_Fast_DrawPoint(x,y,POINT_COLOR);
+			else if(mode==0)LCD_Fast_DrawPoint(x,y,BACK_COLOR);
+			temp<<=1;
+			y++;
+			if(y>=lcddev.height)return;		//超区域了
+			if((y-y0)==size)
+			{
+				y=y0;
+				x++;
+				if(x>=lcddev.width)return;	//超区域了
+				break;
+			}
+		}  	 
+	}  	    	   	 	  
+}   
+//m^n函数
+//返回值:m^n次方.
+u32 LCD_Pow(u8 m,u8 n)
+{
+	u32 result=1;	 
+	while(n--)result*=m;    
+	return result;
+}			 
+
+
+
+
+
 
 
 
