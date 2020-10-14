@@ -10,7 +10,7 @@
 //                  SPFD5408/1505/B505/C505/NT35310/NT35510/SSD1963等		    
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//All rights reserved	
+
 //********************************************************************************
 //V1.2修改说明
 //支持了SPFD5408的驱动,另外把液晶ID直接打印成HEX格式.方便查看LCD驱动IC.
@@ -701,7 +701,6 @@ void LCD_Init(void)
 			}
  		}  	
 	} 
-
 	if(lcddev.id==0X9341||lcddev.id==0X5310||lcddev.id==0X5510||lcddev.id==0X1963)//如果是这几个IC,则设置WR时序为最快
 	{
 		//重新配置写时序控制寄存器的时序   	 							    
@@ -2743,7 +2742,7 @@ void LCD_DrawLine(u16 x1, u16 y1, u16 x2, u16 y2)
 			uCol+=incy; 
 		} 
 	}  
-} 
+}    
 //画矩形	  
 //(x1,y1),(x2,y2):矩形的对角坐标
 void LCD_DrawRectangle(u16 x1, u16 y1, u16 x2, u16 y2)
@@ -2824,7 +2823,6 @@ u32 LCD_Pow(u8 m,u8 n)
 	while(n--)result*=m;    
 	return result;
 }			 
-
 //显示数字,高位为0,则不显示
 //x,y :起点坐标	 
 //len :数字的位数
@@ -2850,7 +2848,6 @@ void LCD_ShowNum(u16 x,u16 y,u32 num,u8 len,u8 size)
 	 	LCD_ShowChar(x+(size/2)*t,y,temp+'0',size,0); 
 	}
 } 
-
 //显示数字,高位为0,还是显示
 //x,y:起点坐标
 //num:数值(0~999999999);	 
@@ -2880,7 +2877,6 @@ void LCD_ShowxNum(u16 x,u16 y,u32 num,u8 len,u8 size,u8 mode)
 	 	LCD_ShowChar(x+(size/2)*t,y,temp+'0',size,mode&0X01); 
 	}
 } 
-
 //显示字符串
 //x,y:起点坐标
 //width,height:区域大小  
@@ -2888,7 +2884,7 @@ void LCD_ShowxNum(u16 x,u16 y,u32 num,u8 len,u8 size,u8 mode)
 //*p:字符串起始地址		  
 void LCD_ShowString(u16 x,u16 y,u16 width,u16 height,u8 size,u8 *p)
 {         
-  	u8 x0=x;
+	u8 x0=x;
 	width+=x;
 	height+=y;
     while((*p<='~')&&(*p>=' '))//判断是不是非法字符!
@@ -2900,6 +2896,9 @@ void LCD_ShowString(u16 x,u16 y,u16 width,u16 height,u8 size,u8 *p)
         p++;
     }  
 }
+
+
+
 
 
 
