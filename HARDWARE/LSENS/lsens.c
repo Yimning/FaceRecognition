@@ -29,6 +29,7 @@ u8 Lsens_Get_Val(void)
 		temp_val+=Get_Adc3(LSENS_ADC_CHX);	//读取ADC值
 		delay_ms(5);
 	}
+	temp_val/=LSENS_READ_TIMES;//得到平均值 
 
 }
 
