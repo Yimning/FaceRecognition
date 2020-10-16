@@ -30,7 +30,8 @@ u8 Lsens_Get_Val(void)
 		delay_ms(5);
 	}
 	temp_val/=LSENS_READ_TIMES;//得到平均值 
-
+	if(temp_val>4000)temp_val=4000;
+	return (u8)(100-(temp_val/40));
 }
 
 
