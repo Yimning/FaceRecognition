@@ -18,6 +18,18 @@ void Lsens_Init(void)
 	Adc3_Init();
 }
 
+//读取Light Sens的值
+//0~100:0,最暗;100,最亮 
+u8 Lsens_Get_Val(void)
+{
+
+}
+
+
+
+
+
+
 
 
 
