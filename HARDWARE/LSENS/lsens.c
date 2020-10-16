@@ -22,6 +22,8 @@ void Lsens_Init(void)
 //0~100:0,最暗;100,最亮 
 u8 Lsens_Get_Val(void)
 {
+	u32 temp_val=0;
+	u8 t;
 
 }
 
