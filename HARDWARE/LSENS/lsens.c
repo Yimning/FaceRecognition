@@ -11,6 +11,14 @@
 
   
 //初始化光敏传感器
+void Lsens_Init(void)
+{
+	RCC->AHB1ENR|=1<<5;    	//使能PORTF时钟	  
+	GPIO_Set(GPIOF,PIN7,GPIO_MODE_AIN,0,0,GPIO_PUPD_PU);//PF7,模拟输入,下拉   
+	Adc3_Init();
+}
+
+
 
 
 
