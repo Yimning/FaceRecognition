@@ -3,10 +3,16 @@
 #include "delay.h"
 #include "usart.h"   
 //////////////////////////////////////////////////////////////////////////////////	 
+//本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
 //MPU6050 驱动代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
+//创建日期:2014/5/9
+//版本：V1.0
+//版权所有，盗版必究。
+//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
+//All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
 
 //初始化MPU6050
@@ -210,24 +216,6 @@ u8 MPU_Write_Byte(u8 reg,u8 data)
 	}		 
     IIC_Stop();	 
 	return 0;
-}
-//IIC读一个字节 
-//reg:寄存器地址 
-//返回值:读到的数据
-u8 MPU_Read_Byte(u8 reg)
-{
-	u8 res;
-    IIC_Start(); 
-	IIC_Send_Byte((MPU_ADDR<<1)|0);//发送器件地址+写命令	
-	IIC_Wait_Ack();		//等待应答 
-    IIC_Send_Byte(reg);	//写寄存器地址
-    IIC_Wait_Ack();		//等待应答
-    IIC_Start();
-	IIC_Send_Byte((MPU_ADDR<<1)|1);//发送器件地址+读命令	
-    IIC_Wait_Ack();		//等待应答 
-	res=IIC_Read_Byte(0);//读取数据,发送nACK 
-    IIC_Stop();			//产生一个停止条件 
-	return res;		
 }
 
 
