@@ -80,6 +80,81 @@ u8 MPU_Set_Rate(u16 rate)
  	return MPU_Set_LPF(rate/2);	//自动设置LPF为采样率的一半
 }
 
+//得到温度值
+//返回值:温度值(扩大了100倍)
+short MPU_Get_Temperature(void)
+{
+    u8 buf[2]; 
+    short raw;
+	float temp;
+	MPU_Read_Len(MPU_ADDR,MPU_TEMP_OUTH_REG,2,buf); 
+    raw=((u16)buf[0]<<8)|buf[1];  
+    temp=36.53+((double)raw)/340;  
+    return temp*100;;
+}
+//得到陀螺仪值(原始值)
+//gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+//返回值:0,成功
+//    其他,错误代码
+u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
+{
+    u8 buf[6],res;  
+	res=MPU_Read_Len(MPU_ADDR,MPU_GYRO_XOUTH_REG,6,buf);
+	if(res==0)
+	{
+		*gx=((u16)buf[0]<<8)|buf[1];  
+		*gy=((u16)buf[2]<<8)|buf[3];  
+		*gz=((u16)buf[4]<<8)|buf[5];
+	} 	
+    return res;;
+}
+//得到加速度值(原始值)
+//gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+//返回值:0,成功
+//    其他,错误代码
+u8 MPU_Get_Accelerometer(short *ax,short *ay,short *az)
+{
+    u8 buf[6],res;  
+	res=MPU_Read_Len(MPU_ADDR,MPU_ACCEL_XOUTH_REG,6,buf);
+	if(res==0)
+	{
+		*ax=((u16)buf[0]<<8)|buf[1];  
+		*ay=((u16)buf[2]<<8)|buf[3];  
+		*az=((u16)buf[4]<<8)|buf[5];
+	} 	
+    return res;;
+}
+//IIC连续写
+//addr:器件地址 
+//reg:寄存器地址
+//len:写入长度
+//buf:数据区
+//返回值:0,正常
+//    其他,错误代码
+u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf)
+{
+	u8 i; 
+    IIC_Start(); 
+	IIC_Send_Byte((addr<<1)|0);//发送器件地址+写命令	
+	if(IIC_Wait_Ack())	//等待应答
+	{
+		IIC_Stop();		 
+		return 1;		
+	}
+    IIC_Send_Byte(reg);	//写寄存器地址
+    IIC_Wait_Ack();		//等待应答
+	for(i=0;i<len;i++)
+	{
+		IIC_Send_Byte(buf[i]);	//发送数据
+		if(IIC_Wait_Ack())		//等待ACK
+		{
+			IIC_Stop();	 
+			return 1;		 
+		}		
+	}    
+    IIC_Stop();	 
+	return 0;	
+} 
 
 
 
