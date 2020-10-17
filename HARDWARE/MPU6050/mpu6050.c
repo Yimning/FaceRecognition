@@ -185,6 +185,49 @@ u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf)
 	}    
     IIC_Stop();	//产生一个停止条件 
 	return 0;	
-
+}
+//IIC写一个字节 
+//reg:寄存器地址
+//data:数据
+//返回值:0,正常
+//    其他,错误代码
+u8 MPU_Write_Byte(u8 reg,u8 data) 				 
+{ 
+    IIC_Start(); 
+	IIC_Send_Byte((MPU_ADDR<<1)|0);//发送器件地址+写命令	
+	if(IIC_Wait_Ack())	//等待应答
+	{
+		IIC_Stop();		 
+		return 1;		
+	}
+    IIC_Send_Byte(reg);	//写寄存器地址
+    IIC_Wait_Ack();		//等待应答 
+	IIC_Send_Byte(data);//发送数据
+	if(IIC_Wait_Ack())	//等待ACK
+	{
+		IIC_Stop();	 
+		return 1;		 
+	}		 
+    IIC_Stop();	 
+	return 0;
+}
+//IIC读一个字节 
+//reg:寄存器地址 
+//返回值:读到的数据
+u8 MPU_Read_Byte(u8 reg)
+{
+	u8 res;
+    IIC_Start(); 
+	IIC_Send_Byte((MPU_ADDR<<1)|0);//发送器件地址+写命令	
+	IIC_Wait_Ack();		//等待应答 
+    IIC_Send_Byte(reg);	//写寄存器地址
+    IIC_Wait_Ack();		//等待应答
+    IIC_Start();
+	IIC_Send_Byte((MPU_ADDR<<1)|1);//发送器件地址+读命令	
+    IIC_Wait_Ack();		//等待应答 
+	res=IIC_Read_Byte(0);//读取数据,发送nACK 
+    IIC_Stop();			//产生一个停止条件 
+	return res;		
+}
 
 
