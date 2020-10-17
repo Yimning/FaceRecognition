@@ -223,7 +223,12 @@ u8 MPU_Read_Byte(u8 reg)
 	IIC_Wait_Ack();		//等待应答 
     IIC_Send_Byte(reg);	//写寄存器地址
     IIC_Wait_Ack();		//等待应答
-	
+    IIC_Start();
+	IIC_Send_Byte((MPU_ADDR<<1)|1);//发送器件地址+读命令	
+    IIC_Wait_Ack();		//等待应答 
+	res=IIC_Read_Byte(0);//读取数据,发送nACK 
+    IIC_Stop();			//产生一个停止条件 
+	return res;		
 }
 
 
