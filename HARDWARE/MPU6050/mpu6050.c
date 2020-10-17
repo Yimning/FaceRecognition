@@ -218,7 +218,12 @@ u8 MPU_Write_Byte(u8 reg,u8 data)
 u8 MPU_Read_Byte(u8 reg)
 {
 	u8 res;
-
+    IIC_Start(); 
+	IIC_Send_Byte((MPU_ADDR<<1)|0);//发送器件地址+写命令	
+	IIC_Wait_Ack();		//等待应答 
+    IIC_Send_Byte(reg);	//写寄存器地址
+    IIC_Wait_Ack();		//等待应答
+	
 }
 
 
