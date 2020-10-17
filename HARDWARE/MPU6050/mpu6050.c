@@ -217,7 +217,8 @@ u8 MPU_Write_Byte(u8 reg,u8 data)
 //返回值:读到的数据
 u8 MPU_Read_Byte(u8 reg)
 {
-	
+	u8 res;
+
 }
 
 
