@@ -212,5 +212,12 @@ u8 MPU_Write_Byte(u8 reg,u8 data)
     IIC_Stop();	 
 	return 0;
 }
+//IIC读一个字节 
+//reg:寄存器地址 
+//返回值:读到的数据
+u8 MPU_Read_Byte(u8 reg)
+{
+	
+}
 
 
