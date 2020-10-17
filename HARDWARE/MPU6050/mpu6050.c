@@ -92,5 +92,21 @@ short MPU_Get_Temperature(void)
     temp=36.53+((double)raw)/340;  
     return temp*100;;
 }
+//得到陀螺仪值(原始值)
+//gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
+//返回值:0,成功
+//    其他,错误代码
+u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
+{
+    u8 buf[6],res;  
+	res=MPU_Read_Len(MPU_ADDR,MPU_GYRO_XOUTH_REG,6,buf);
+	if(res==0)
+	{
+		*gx=((u16)buf[0]<<8)|buf[1];  
+		*gy=((u16)buf[2]<<8)|buf[3];  
+		*gz=((u16)buf[4]<<8)|buf[5];
+	} 	
+    return res;;
+}
 
 
