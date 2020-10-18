@@ -32,6 +32,26 @@ void NRF24L01_Init(void)
 	NRF24L01_CSN=1;			//SPI片选取消	 		 	 
 }
 
+//检测24L01是否存在
+//返回值:0，成功;1，失败	
+u8 NRF24L01_Check(void)
+{
+	u8 buf[5]={0XA5,0XA5,0XA5,0XA5,0XA5};
+	u8 i;
+	SPI1_SetSpeed(SPI_SPEED_8); //spi速度为10.5Mhz（24L01的最大SPI时钟为10Mhz）   	 
+	NRF24L01_Write_Buf(NRF_WRITE_REG+TX_ADDR,buf,5);//写入5个字节的地址.	
+	NRF24L01_Read_Buf(TX_ADDR,buf,5); //读出写入的地址  
+	for(i=0;i<5;i++)if(buf[i]!=0XA5)break;	 							   
+	if(i!=5)return 1;//检测24L01错误	
+	return 0;		 //检测到24L01
+}	 	 
+
+
+
+
+
+  
+
 
 
 
