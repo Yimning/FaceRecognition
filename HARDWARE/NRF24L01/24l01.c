@@ -143,6 +143,14 @@ u8 NRF24L01_RxPacket(u8 *rxbuf)
 	return 1;//没收到任何数据
 }					    
 //该函数初始化NRF24L01到RX模式
+//设置RX地址,写RX数据宽度,选择RF频道,波特率和LNA HCURR
+//当CE变高后,即进入RX模式,并可以接收数据了		   
+
+
+
+
+
+
 
 
 
