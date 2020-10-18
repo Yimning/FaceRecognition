@@ -100,6 +100,32 @@ u8 NRF24L01_Write_Buf(u8 reg, u8 *pBuf, u8 len)
 }				   
 
 
+//启动NRF24L01发送一次数据
+//txbuf:待发送数据首地址
+//返回值:发送完成状况
+u8 NRF24L01_TxPacket(u8 *txbuf)
+{
+	u8 sta;
+ 	SPI1_SetSpeed(SPI_SPEED_8);//spi速度为10.5Mhz（24L01的最大SPI时钟为10Mhz）   
+	NRF24L01_CE=0;
+  	NRF24L01_Write_Buf(WR_TX_PLOAD,txbuf,TX_PLOAD_WIDTH);//写数据到TX BUF  32个字节
+ 	NRF24L01_CE=1;//启动发送	   
+	while(NRF24L01_IRQ!=0);//等待发送完成
+	sta=NRF24L01_Read_Reg(STATUS);  //读取状态寄存器的值	   
+	NRF24L01_Write_Reg(NRF_WRITE_REG+STATUS,sta); //清除TX_DS或MAX_RT中断标志
+	if(sta&MAX_TX)//达到最大重发次数
+	{
+		NRF24L01_Write_Reg(FLUSH_TX,0xff);//清除TX FIFO寄存器 
+		return MAX_TX; 
+	}
+	if(sta&TX_OK)//发送完成
+	{
+		return TX_OK;
+	}
+	return 0xff;//其他原因发送失败
+}
+
+
 
 
   
