@@ -47,8 +47,29 @@ u8 NRF24L01_Check(void)
 }	 	 
 
 
-
-
+//SPI写寄存器
+//reg:指定寄存器地址
+//value:写入的值
+u8 NRF24L01_Write_Reg(u8 reg,u8 value)
+{
+	u8 status;	
+   	NRF24L01_CSN=0;                 //使能SPI传输
+  	status =SPI1_ReadWriteByte(reg);//发送寄存器号 
+  	SPI1_ReadWriteByte(value);      //写入寄存器的值
+  	NRF24L01_CSN=1;                 //禁止SPI传输	   
+  	return(status);       			//返回状态值
+}
+//读取SPI寄存器值
+//reg:要读的寄存器
+u8 NRF24L01_Read_Reg(u8 reg)
+{
+	u8 reg_val;	    
+ 	NRF24L01_CSN = 0;          //使能SPI传输		
+  	SPI1_ReadWriteByte(reg);   //发送寄存器号
+  	reg_val=SPI1_ReadWriteByte(0XFF);//读取寄存器内容
+  	NRF24L01_CSN = 1;          //禁止SPI传输		    
+  	return(reg_val);           //返回状态值
+}	
 
   
 
