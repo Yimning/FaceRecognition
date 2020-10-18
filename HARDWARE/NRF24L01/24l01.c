@@ -70,6 +70,37 @@ u8 NRF24L01_Read_Reg(u8 reg)
   	NRF24L01_CSN = 1;          //禁止SPI传输		    
   	return(reg_val);           //返回状态值
 }	
+//在指定位置读出指定长度的数据
+//reg:寄存器(位置)
+//*pBuf:数据指针
+//len:数据长度
+//返回值,此次读到的状态寄存器值 
+u8 NRF24L01_Read_Buf(u8 reg,u8 *pBuf,u8 len)
+{
+	u8 status,u8_ctr;	       
+  	NRF24L01_CSN = 0;           //使能SPI传输
+  	status=SPI1_ReadWriteByte(reg);//发送寄存器值(位置),并读取状态值   	   
+ 	for(u8_ctr=0;u8_ctr<len;u8_ctr++)pBuf[u8_ctr]=SPI1_ReadWriteByte(0XFF);//读出数据
+  	NRF24L01_CSN=1;       //关闭SPI传输
+  	return status;        //返回读到的状态值
+}
+//在指定位置写指定长度的数据
+//reg:寄存器(位置)
+//*pBuf:数据指针
+//len:数据长度
+//返回值,此次读到的状态寄存器值
+u8 NRF24L01_Write_Buf(u8 reg, u8 *pBuf, u8 len)
+{
+	u8 status,u8_ctr;	    
+ 	NRF24L01_CSN = 0;          //使能SPI传输
+  	status = SPI1_ReadWriteByte(reg);//发送寄存器值(位置),并读取状态值
+  	for(u8_ctr=0; u8_ctr<len; u8_ctr++)SPI1_ReadWriteByte(*pBuf++); //写入数据	 
+  	NRF24L01_CSN = 1;       //关闭SPI传输
+  	return status;          //返回读到的状态值
+}				   
+
+
+
 
   
 
