@@ -125,15 +125,24 @@ u8 NRF24L01_TxPacket(u8 *txbuf)
 	return 0xff;//其他原因发送失败
 }
 
-
-
-
-  
-
-
-
-
-
+//启动NRF24L01发送一次数据
+//txbuf:待发送数据首地址
+//返回值:0，接收完成；其他，错误代码
+u8 NRF24L01_RxPacket(u8 *rxbuf)
+{
+	u8 sta;		    							   
+	SPI1_SetSpeed(SPI_SPEED_8); //spi速度为10.5Mhz（24L01的最大SPI时钟为10Mhz）   
+	sta=NRF24L01_Read_Reg(STATUS);  //读取状态寄存器的值    	 
+	NRF24L01_Write_Reg(NRF_WRITE_REG+STATUS,sta); //清除TX_DS或MAX_RT中断标志
+	if(sta&RX_OK)//接收到数据
+	{
+		NRF24L01_Read_Buf(RD_RX_PLOAD,rxbuf,RX_PLOAD_WIDTH);//读取数据
+		NRF24L01_Write_Reg(FLUSH_RX,0xff);//清除RX FIFO寄存器 
+		return 0; 
+	}	   
+	return 1;//没收到任何数据
+}					    
+//该函数初始化NRF24L01到RX模式
 
 
 
