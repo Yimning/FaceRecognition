@@ -300,6 +300,37 @@ void OV2640_Color_Bar(u8 sw)
 }
 
 
+//设置传感器输出窗口 
+//sx,sy,起始地址
+//width,height:宽度(对应:horizontal)和高度(对应:vertical)
+void OV2640_Window_Set(u16 sx,u16 sy,u16 width,u16 height)
+{
+	u16 endx;
+	u16 endy;
+	u8 temp; 
+	endx=sx+width/2;	//V*2
+ 	endy=sy+height/2;
+	
+	SCCB_WR_Reg(0XFF,0X01);			
+	temp=SCCB_RD_Reg(0X03);				//读取Vref之前的值
+	temp&=0XF0;
+	temp|=((endy&0X03)<<2)|(sy&0X03);
+	SCCB_WR_Reg(0X03,temp);				//设置Vref的start和end的最低2位
+	SCCB_WR_Reg(0X19,sy>>2);			//设置Vref的start高8位
+	SCCB_WR_Reg(0X1A,endy>>2);			//设置Vref的end的高8位
+	
+	temp=SCCB_RD_Reg(0X32);				//读取Href之前的值
+	temp&=0XC0;
+	temp|=((endx&0X07)<<3)|(sx&0X07);
+	SCCB_WR_Reg(0X32,temp);				//设置Href的start和end的最低3位
+	SCCB_WR_Reg(0X17,sx>>3);			//设置Href的start高8位
+	SCCB_WR_Reg(0X18,endx>>3);			//设置Href的end的高8位
+}
+//设置图像输出大小
+
+
+
+
 
 
 
