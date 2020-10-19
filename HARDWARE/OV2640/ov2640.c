@@ -327,6 +327,13 @@ void OV2640_Window_Set(u16 sx,u16 sy,u16 width,u16 height)
 	SCCB_WR_Reg(0X18,endx>>3);			//设置Href的end的高8位
 }
 //设置图像输出大小
+//OV2640输出图像的大小(分辨率),完全由该函数确定
+//width,height:宽度(对应:horizontal)和高度(对应:vertical),width和height必须是4的倍数
+//返回值:0,设置成功
+//    其他,设置失败
+
+
+
 
 
 
