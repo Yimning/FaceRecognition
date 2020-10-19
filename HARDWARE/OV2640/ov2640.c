@@ -384,6 +384,13 @@ u8 OV2640_ImageWin_Set(u16 offx,u16 offy,u16 width,u16 height)
 	return 0;
 } 
 //该函数设置图像尺寸大小,也就是所选格式的输出分辨率
+//UXGA:1600*1200,SVGA:800*600,CIF:352*288
+//width,height:图像宽度和图像高度
+//返回值:0,设置成功
+//    其他,设置失败
+
+
+
 
 
 
