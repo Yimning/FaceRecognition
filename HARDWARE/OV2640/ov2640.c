@@ -414,7 +414,13 @@ void OV2640_Set_Svga_Mode(void)
 	OV2640_RST=1;	//结束复位 
   	SCCB_Init();        		//初始化SCCB 的IO口	 
 	SCCB_WR_Reg(OV2640_DSP_RA_DLMT, 0x01);	//操作sensor寄存器
-
+ 	SCCB_WR_Reg(OV2640_SENSOR_COM7, 0x80);	//软复位OV2640
+	delay_ms(50); 
+ 	//初始化 OV2640,采用SXGA分辨率(800*600)  
+	for(i=0;i<sizeof(ov2640_svga_init_reg_tbl)/2;i++)
+	{
+	   	SCCB_WR_Reg(ov2640_svga_init_reg_tbl[i][0],ov2640_svga_init_reg_tbl[i][1]);
+ 	} 
 }
 
 
