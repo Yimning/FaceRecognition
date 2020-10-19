@@ -118,6 +118,186 @@ const static u8 OV2640_AUTOEXPOSURE_LEVEL[5][8]=
 	},
 }; 
 
+//OV2640自动曝光等级设置
+//level:0~4
+void OV2640_Auto_Exposure(u8 level)
+{  
+	u8 i;
+	u8 *p=(u8*)OV2640_AUTOEXPOSURE_LEVEL[level];
+	for(i=0;i<4;i++)
+	{ 
+		SCCB_WR_Reg(p[i*2],p[i*2+1]); 
+	} 
+}  
+//白平衡设置
+//0:自动
+//1:太阳sunny
+//2,阴天cloudy
+//3,办公室office
+//4,家里home
+void OV2640_Light_Mode(u8 mode)
+{
+	u8 regccval=0X5E;//Sunny 
+	u8 regcdval=0X41;
+	u8 regceval=0X54;
+	switch(mode)
+	{ 
+		case 0://auto 
+			SCCB_WR_Reg(0XFF,0X00);	 
+			SCCB_WR_Reg(0XC7,0X00);//AWB ON 
+			return;  	
+		case 2://cloudy
+			regccval=0X65;
+			regcdval=0X41;
+			regceval=0X4F;
+			break;	
+		case 3://office
+			regccval=0X52;
+			regcdval=0X41;
+			regceval=0X66;
+			break;	
+		case 4://home
+			regccval=0X42;
+			regcdval=0X3F;
+			regceval=0X71;
+			break;	
+	}
+	SCCB_WR_Reg(0XFF,0X00);	 
+	SCCB_WR_Reg(0XC7,0X40);	//AWB OFF 
+	SCCB_WR_Reg(0XCC,regccval); 
+	SCCB_WR_Reg(0XCD,regcdval); 
+	SCCB_WR_Reg(0XCE,regceval);  
+}
+//色度设置
+//0:-2
+//1:-1
+//2,0
+//3,+1
+//4,+2
+void OV2640_Color_Saturation(u8 sat)
+{ 
+	u8 reg7dval=((sat+2)<<4)|0X08;
+	SCCB_WR_Reg(0XFF,0X00);		
+	SCCB_WR_Reg(0X7C,0X00);		
+	SCCB_WR_Reg(0X7D,0X02);				
+	SCCB_WR_Reg(0X7C,0X03);			
+	SCCB_WR_Reg(0X7D,reg7dval);			
+	SCCB_WR_Reg(0X7D,reg7dval); 		
+}
+//亮度设置
+//0:(0X00)-2
+//1:(0X10)-1
+//2,(0X20) 0
+//3,(0X30)+1
+//4,(0X40)+2
+void OV2640_Brightness(u8 bright)
+{
+  SCCB_WR_Reg(0xff, 0x00);
+  SCCB_WR_Reg(0x7c, 0x00);
+  SCCB_WR_Reg(0x7d, 0x04);
+  SCCB_WR_Reg(0x7c, 0x09);
+  SCCB_WR_Reg(0x7d, bright<<4); 
+  SCCB_WR_Reg(0x7d, 0x00); 
+}
+//对比度设置
+//0:-2
+//1:-1
+//2,0
+//3,+1
+//4,+2
+void OV2640_Contrast(u8 contrast)
+{
+	u8 reg7d0val=0X20;//默认为普通模式
+	u8 reg7d1val=0X20;
+  	switch(contrast)
+	{
+		case 0://-2
+			reg7d0val=0X18;	 	 
+			reg7d1val=0X34;	 	 
+			break;	
+		case 1://-1
+			reg7d0val=0X1C;	 	 
+			reg7d1val=0X2A;	 	 
+			break;	
+		case 3://1
+			reg7d0val=0X24;	 	 
+			reg7d1val=0X16;	 	 
+			break;	
+		case 4://2
+			reg7d0val=0X28;	 	 
+			reg7d1val=0X0C;	 	 
+			break;	
+	}
+	SCCB_WR_Reg(0xff,0x00);
+	SCCB_WR_Reg(0x7c,0x00);
+	SCCB_WR_Reg(0x7d,0x04);
+	SCCB_WR_Reg(0x7c,0x07);
+	SCCB_WR_Reg(0x7d,0x20);
+	SCCB_WR_Reg(0x7d,reg7d0val);
+	SCCB_WR_Reg(0x7d,reg7d1val);
+	SCCB_WR_Reg(0x7d,0x06);
+}
+//特效设置
+//0:普通模式    
+//1,负片
+//2,黑白   
+//3,偏红色
+//4,偏绿色
+//5,偏蓝色
+//6,复古	    
+void OV2640_Special_Effects(u8 eft)
+{
+	u8 reg7d0val=0X00;//默认为普通模式
+	u8 reg7d1val=0X80;
+	u8 reg7d2val=0X80; 
+	switch(eft)
+	{
+		case 1://负片
+			reg7d0val=0X40; 
+			break;	
+		case 2://黑白
+			reg7d0val=0X18; 
+			break;	 
+		case 3://偏红色
+			reg7d0val=0X18; 
+			reg7d1val=0X40;
+			reg7d2val=0XC0; 
+			break;	
+		case 4://偏绿色
+			reg7d0val=0X18; 
+			reg7d1val=0X40;
+			reg7d2val=0X40; 
+			break;	
+		case 5://偏蓝色
+			reg7d0val=0X18; 
+			reg7d1val=0XA0;
+			reg7d2val=0X40; 
+			break;	
+		case 6://复古
+			reg7d0val=0X18; 
+			reg7d1val=0X40;
+			reg7d2val=0XA6; 
+			break;	 
+	}
+	SCCB_WR_Reg(0xff,0x00);
+	SCCB_WR_Reg(0x7c,0x00);
+	SCCB_WR_Reg(0x7d,reg7d0val);
+	SCCB_WR_Reg(0x7c,0x05);
+	SCCB_WR_Reg(0x7d,reg7d1val);
+	SCCB_WR_Reg(0x7d,reg7d2val); 
+}
+//彩条测试
+//sw:0,关闭彩条
+//   1,开启彩条(注意OV2640的彩条是叠加在图像上面的)
+void OV2640_Color_Bar(u8 sw)
+{
+	u8 reg;
+	SCCB_WR_Reg(0XFF,0X01);
+	reg=SCCB_RD_Reg(0X12);
+	reg&=~(1<<1);
+	if(sw)reg|=1<<1; 
+	SCCB_WR_Reg(0X12,reg);
+}
 
 
 
