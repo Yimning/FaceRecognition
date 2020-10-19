@@ -406,6 +406,14 @@ u8 OV2640_ImageSize_Set(u16 width,u16 height)
 //设置OV2640为SVGA模式
 void OV2640_Set_Svga_Mode(void)
 {
+	u16 i;
+	OV2640_PWDN=0;	//POWER ON
+	delay_ms(10);
+	OV2640_RST=0;	//复位OV2640
+	delay_ms(10);
+	OV2640_RST=1;	//结束复位 
+  	SCCB_Init();        		//初始化SCCB 的IO口	 
+	SCCB_WR_Reg(OV2640_DSP_RA_DLMT, 0x01);	//操作sensor寄存器
 
 }
 
