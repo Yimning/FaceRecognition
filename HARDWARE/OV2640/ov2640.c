@@ -331,6 +331,60 @@ void OV2640_Window_Set(u16 sx,u16 sy,u16 width,u16 height)
 //width,height:宽度(对应:horizontal)和高度(对应:vertical),width和height必须是4的倍数
 //返回值:0,设置成功
 //    其他,设置失败
+u8 OV2640_OutSize_Set(u16 width,u16 height)
+{
+	u16 outh;
+	u16 outw;
+	u8 temp; 
+	if(width%4)return 1;
+	if(height%4)return 2;
+	outw=width/4;
+	outh=height/4; 
+	SCCB_WR_Reg(0XFF,0X00);	
+	SCCB_WR_Reg(0XE0,0X04);			
+	SCCB_WR_Reg(0X5A,outw&0XFF);		//设置OUTW的低八位
+	SCCB_WR_Reg(0X5B,outh&0XFF);		//设置OUTH的低八位
+	temp=(outw>>8)&0X03;
+	temp|=(outh>>6)&0X04;
+	SCCB_WR_Reg(0X5C,temp);				//设置OUTH/OUTW的高位 
+	SCCB_WR_Reg(0XE0,0X00);	
+	return 0;
+}
+//设置图像开窗大小
+//由:OV2640_ImageSize_Set确定传感器输出分辨率从大小.
+//该函数则在这个范围上面进行开窗,用于OV2640_OutSize_Set的输出
+//注意:本函数的宽度和高度,必须大于等于OV2640_OutSize_Set函数的宽度和高度
+//     OV2640_OutSize_Set设置的宽度和高度,根据本函数设置的宽度和高度,由DSP
+//     自动计算缩放比例,输出给外部设备.
+//width,height:宽度(对应:horizontal)和高度(对应:vertical),width和height必须是4的倍数
+//返回值:0,设置成功
+//    其他,设置失败
+u8 OV2640_ImageWin_Set(u16 offx,u16 offy,u16 width,u16 height)
+{
+	u16 hsize;
+	u16 vsize;
+	u8 temp; 
+	if(width%4)return 1;
+	if(height%4)return 2;
+	hsize=width/4;
+	vsize=height/4;
+	SCCB_WR_Reg(0XFF,0X00);	
+	SCCB_WR_Reg(0XE0,0X04);					
+	SCCB_WR_Reg(0X51,hsize&0XFF);		//设置H_SIZE的低八位
+	SCCB_WR_Reg(0X52,vsize&0XFF);		//设置V_SIZE的低八位
+	SCCB_WR_Reg(0X53,offx&0XFF);		//设置offx的低八位
+	SCCB_WR_Reg(0X54,offy&0XFF);		//设置offy的低八位
+	temp=(vsize>>1)&0X80;
+	temp|=(offy>>4)&0X70;
+	temp|=(hsize>>5)&0X08;
+	temp|=(offx>>8)&0X07; 
+	SCCB_WR_Reg(0X55,temp);				//设置H_SIZE/V_SIZE/OFFX,OFFY的高位
+	SCCB_WR_Reg(0X57,(hsize>>2)&0X80);	//设置H_SIZE/V_SIZE/OFFX,OFFY的高位
+	SCCB_WR_Reg(0XE0,0X00);	
+	return 0;
+} 
+//该函数设置图像尺寸大小,也就是所选格式的输出分辨率
+
 
 
 
