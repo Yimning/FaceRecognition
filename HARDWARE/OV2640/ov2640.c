@@ -388,10 +388,21 @@ u8 OV2640_ImageWin_Set(u16 offx,u16 offy,u16 width,u16 height)
 //width,height:图像宽度和图像高度
 //返回值:0,设置成功
 //    其他,设置失败
-
-
-
-
+u8 OV2640_ImageSize_Set(u16 width,u16 height)
+{ 
+	u8 temp; 
+	SCCB_WR_Reg(0XFF,0X00);			
+	SCCB_WR_Reg(0XE0,0X04);			
+	SCCB_WR_Reg(0XC0,(width)>>3&0XFF);		//设置HSIZE的10:3位
+	SCCB_WR_Reg(0XC1,(height)>>3&0XFF);		//设置VSIZE的10:3位
+	temp=(width&0X07)<<3;
+	temp|=height&0X07;
+	temp|=(width>>4)&0X80; 
+	SCCB_WR_Reg(0X8C,temp);	
+	SCCB_WR_Reg(0XE0,0X00);				 
+	return 0;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
