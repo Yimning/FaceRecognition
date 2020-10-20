@@ -118,7 +118,10 @@ void TIM1_CC_IRQHandler(void)
 u8 Remote_Scan(void)
 {        
 
-	
+	u8 sta=0;       
+    u8 t1,t2;  
+
+    return sta;	
 	
 }
 
