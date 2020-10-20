@@ -34,12 +34,37 @@ void Remote_Init(void)
   	MY_NVIC_Init(1,3,TIM1_CC_IRQn,2);//抢占1，子优先级3，组2									 
   	MY_NVIC_Init(1,2,TIM1_UP_TIM10_IRQn,2);//抢占1，子优先级2，组2									 
 }
-
-
-
-
-
-
+//遥控器接收状态
+//[7]:收到了引导码标志
+//[6]:得到了一个按键的所有信息
+//[5]:保留	
+//[4]:标记上升沿是否已经被捕获								   
+//[3:0]:溢出计时器
+u8 	RmtSta=0;	  	  
+u16 Dval;		//下降沿时计数器的值
+u32 RmtRec=0;	//红外接收到的数据	   		    
+u8  RmtCnt=0;	//按键按下的次数	 
+//定时器1溢出中断
+void TIM1_UP_TIM10_IRQHandler(void)
+{
+	u16 tsr; 
+	tsr=TIM1->SR;
+	if(tsr&0X01)//处理溢出
+	{
+		if(RmtSta&0x80)//上次有数据被接收到了
+		{	
+			RmtSta&=~0X10;						//取消上升沿已经被捕获标记
+			if((RmtSta&0X0F)==0X00)RmtSta|=1<<6;//标记已经完成一次按键的键值信息采集
+			if((RmtSta&0X0F)<14)RmtSta++;
+			else
+			{
+				RmtSta&=~(1<<7);//清空引导标识
+				RmtSta&=0XF0;	//清空计数器	
+			}						 	   	
+		}							    
+	}
+	TIM1->SR=0;	//清除中断标志位 	 
+} 
 
 
 
