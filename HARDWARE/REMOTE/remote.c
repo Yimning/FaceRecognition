@@ -113,6 +113,13 @@ void TIM1_CC_IRQHandler(void)
 }
 //处理红外键盘
 //返回值:
+//	 0,没有任何按键按下
+//其他,按下的按键键值.
+u8 Remote_Scan(void)
+{        
+
+}
+
 
 
 
