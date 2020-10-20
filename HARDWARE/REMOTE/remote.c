@@ -120,7 +120,12 @@ u8 Remote_Scan(void)
 
 	u8 sta=0;       
     u8 t1,t2;  
+	if(RmtSta&(1<<6))//得到一个按键的所有信息了
+	{ 
+	    t1=RmtRec>>24;			//得到地址码
+	    t2=(RmtRec>>16)&0xff;	//得到地址反码 
 
+	}  
     return sta;	
 	
 }
