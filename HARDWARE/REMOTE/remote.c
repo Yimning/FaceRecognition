@@ -66,6 +66,55 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	TIM1->SR=0;	//清除中断标志位 	 
 } 
 
+//定时器1输入捕获中断服务程序	 
+void TIM1_CC_IRQHandler(void)
+{ 		    	 
+	u16 tsr; 
+	tsr=TIM1->SR; 
+	if(tsr&0x02)//处理捕获(CC1IE)中断
+	{	  
+		if(RDATA)//上升沿捕获
+		{
+  			TIM1->CCER|=1<<1; 				//CC1P=1	设置为下降沿捕获
+			TIM1->CNT=0;					//清空定时器值
+			RmtSta|=0X10;					//标记上升沿已经被捕获
+		}else //下降沿捕获
+		{
+			Dval=TIM1->CCR1;				//读取CCR1也可以清CC1IF标志位
+  			TIM1->CCER&=~(1<<1);			//CC1P=0	设置为上升沿捕获
+			if(RmtSta&0X10)					//完成一次高电平捕获 
+			{
+ 				if(RmtSta&0X80)//接收到了引导码
+				{
+					
+					if(Dval>300&&Dval<800)			//560为标准值,560us
+					{
+						RmtRec<<=1;	//左移一位.
+						RmtRec|=0;	//接收到0	   
+					}else if(Dval>1400&&Dval<1800)	//1680为标准值,1680us
+					{
+						RmtRec<<=1;	//左移一位.
+						RmtRec|=1;	//接收到1
+					}else if(Dval>2200&&Dval<2600)	//得到按键键值增加的信息 2500为标准值2.5ms
+					{
+						RmtCnt++; 		//按键次数增加1次
+						RmtSta&=0XF0;	//清空计时器		
+					}
+ 				}else if(Dval>4200&&Dval<4700)		//4500为标准值4.5ms
+				{
+					RmtSta|=1<<7;	//标记成功接收到了引导码
+					RmtCnt=0;		//清除按键次数计数器
+				}						 
+			}
+			RmtSta&=~(1<<4);
+		}				 		     	    					   
+	}
+	TIM1->SR=0;	//清除中断标志位 	 
+}
+//处理红外键盘
+//返回值:
+
+
 
 
 
