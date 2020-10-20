@@ -124,7 +124,17 @@ u8 Remote_Scan(void)
 	{ 
 	    t1=RmtRec>>24;			//得到地址码
 	    t2=(RmtRec>>16)&0xff;	//得到地址反码 
-
+ 	    if((t1==(u8)~t2)&&t1==REMOTE_ID)//检验遥控识别码(ID)及地址 
+	    { 
+	        t1=RmtRec>>8;
+	        t2=RmtRec; 	
+	        if(t1==(u8)~t2)sta=t1;//键值正确	 
+		}   
+		if((sta==0)||((RmtSta&0X80)==0))//按键数据错误/遥控已经没有按下了
+		{
+		 	RmtSta&=~(1<<6);//清除接收到有效按键标识
+			RmtCnt=0;		//清除按键次数计数器
+		}
 	}  
     return sta;	
 	
