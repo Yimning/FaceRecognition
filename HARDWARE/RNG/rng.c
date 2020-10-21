@@ -31,7 +31,12 @@ u32 RNG_Get_RandomNum(void)
 	return RNG->DR;	
 }
 //得到某个范围内的随机数
+//min,max,最小,最大值.
+//返回值:得到的随机数(rval),满足:min<=rval<=max
+int RNG_Get_RandomRange(int min,int max)
+{ 
 
+}
 
 
 
