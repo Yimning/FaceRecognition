@@ -25,6 +25,11 @@ u8 RNG_Init(void)
 
 //得到随机数
 //返回值:获取到的随机数
+u32 RNG_Get_RandomNum(void)
+{	 
+
+}
+
 
 
 
