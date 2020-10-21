@@ -27,8 +27,11 @@ u8 RNG_Init(void)
 //返回值:获取到的随机数
 u32 RNG_Get_RandomNum(void)
 {	 
-
+	while((RNG->SR&0X01)==0);	//等待随机数就绪  
+	return RNG->DR;	
 }
+//得到某个范围内的随机数
+
 
 
 
