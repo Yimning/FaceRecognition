@@ -64,48 +64,20 @@ void RS485_Init(u32 pclk1,u32 bound)
 	RS485_TX_EN=0;				//默认为接收模式	
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//RS485发送len个字节.
+//buf:发送区首地址
+//len:发送的字节数(为了和本代码的接收匹配,这里建议不要超过64个字节)
+void RS485_Send_Data(u8 *buf,u8 len)
+{
+	u8 t;
+	RS485_TX_EN=1;			//设置为发送模式
+  	for(t=0;t<len;t++)		//循环发送数据
+	{
+		while((USART2->SR&0X40)==0);//等待发送结束		  
+		USART2->DR=buf[t];
+	}	 
+	while((USART2->SR&0X40)==0);//等待发送结束	
+	RS485_RX_CNT=0;	  
+	RS485_TX_EN=0;				//设置为接收模式	
+}
 
