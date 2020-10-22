@@ -90,7 +90,10 @@ void RS485_Receive_Data(u8 *buf,u8 *len)
 	u8 i=0;
 	*len=0;				//默认为0
 	delay_ms(10);		//等待10ms,连续超过10ms没有接收到一个数据,则认为接收结束
+	if(rxlen==RS485_RX_CNT&&rxlen)//接收到了数据,且接收完成了
+	{
 
+	}
 }
 
 
