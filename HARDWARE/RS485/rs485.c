@@ -66,4 +66,3 @@ void RS485_Init(u32 pclk1,u32 bound)
 
 
 
-
