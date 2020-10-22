@@ -98,6 +98,7 @@ void RS485_Receive_Data(u8 *buf,u8 *len)
 		}		
 		*len=RS485_RX_CNT;	//记录本次数据长度
 		RS485_RX_CNT=0;		//清零
+		
 	}
 }
 
