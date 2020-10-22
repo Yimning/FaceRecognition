@@ -86,6 +86,10 @@ void RS485_Send_Data(u8 *buf,u8 len)
 //len:读到的数据长度
 void RS485_Receive_Data(u8 *buf,u8 *len)
 {
+	u8 rxlen=RS485_RX_CNT;
+	u8 i=0;
+	*len=0;				//默认为0
+	delay_ms(10);		//等待10ms,连续超过10ms没有接收到一个数据,则认为接收结束
 
 }
 
