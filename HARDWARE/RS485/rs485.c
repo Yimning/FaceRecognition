@@ -81,3 +81,13 @@ void RS485_Send_Data(u8 *buf,u8 len)
 	RS485_TX_EN=0;				//设置为接收模式	
 }
 
+//RS485查询接收到的数据
+//buf:接收缓存首地址
+//len:读到的数据长度
+void RS485_Receive_Data(u8 *buf,u8 *len)
+{
+
+}
+
+
+
