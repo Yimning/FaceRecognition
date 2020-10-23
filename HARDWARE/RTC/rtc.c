@@ -217,6 +217,38 @@ void RTC_Set_AlarmA(u8 week,u8 hour,u8 min,u8 sec)
 //      10x,ck_spre,1Hz;11x,1Hz,且cnt值增加2^16(即cnt+2^16)
 //注意:RTC就是RTC的时钟频率,即RTCCLK!
 //cnt:自动重装载值.减到0,产生中断.
+void RTC_Set_WakeUp(u8 wksel,u16 cnt)
+{ 
+	//关闭RTC寄存器写保护
+	RTC->WPR=0xCA; 
+	RTC->WPR=0x53;
+	RTC->CR&=~(1<<10);			//关闭WAKE UP
+	while((RTC->ISR&0X04)==0);	//等待WAKE UP修改允许
+	RTC->CR&=~(7<<0);			//清除原来的设置
+	RTC->CR|=wksel&0X07;		//设置新的值
+	RTC->WUTR=cnt;				//设置WAKE UP自动重装载寄存器值
+	RTC->ISR&=~(1<<10);			//清除RTC WAKE UP的标志
+	RTC->CR|=1<<14;				//开启WAKE UP 定时器中断
+	RTC->CR|=1<<10;				//开启WAKE UP 定时器　
+	RTC->WPR=0XFF;				//禁止修改RTC寄存器 　
+	EXTI->PR=1<<22;  			//清除LINE22上的中断标志位  
+	EXTI->IMR|=1<<22;			//开启line22上的中断 
+	EXTI->RTSR|=1<<22;			//line22上事件上升降沿触发 
+	MY_NVIC_Init(2,2,RTC_WKUP_IRQn,2); //抢占2，子优先级2，组2 
+}
+
+//RTC闹钟中断服务函数
+void RTC_Alarm_IRQHandler(void)
+{    
+	if(RTC->ISR&(1<<8))//ALARM A中断?
+	{
+		RTC->ISR&=~(1<<8);	//清除中断标志
+		printf("ALARM A!\r\n");
+	}   
+	EXTI->PR|=1<<17;	//清除中断线17的中断标志 											 
+}
+
+
 
 
 
