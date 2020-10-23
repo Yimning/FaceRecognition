@@ -87,5 +87,65 @@ u8 RTC_BCD2DEC(u8 val)
 	return (temp+(val&0X0F));
 }
 
+//RTC时间设置
+//hour,min,sec:小时,分钟,秒钟
+//ampm:AM/PM,0=AM/24H,1=PM.
+//返回值:0,成功
+//       1,进入初始化模式失败 
+u8 RTC_Set_Time(u8 hour,u8 min,u8 sec,u8 ampm)
+{
+	u32 temp=0;
+	//关闭RTC寄存器写保护
+	RTC->WPR=0xCA;
+	RTC->WPR=0x53; 
+	if(RTC_Init_Mode())return 1;//进入RTC初始化模式失败
+	temp=(((u32)ampm&0X01)<<22)|((u32)RTC_DEC2BCD(hour)<<16)|((u32)RTC_DEC2BCD(min)<<8)|(RTC_DEC2BCD(sec));
+	RTC->TR=temp;
+	RTC->ISR&=~(1<<7);			//退出RTC初始化模式 
+	return 0; 
+}
+//RTC日期设置
+//year,month,date:年(0~99),月(1~12),日(0~31)
+//week:星期(1~7,0,非法!)
+//返回值:0,成功
+//       1,进入初始化模式失败 
+u8 RTC_Set_Date(u8 year,u8 month,u8 date,u8 week)
+{
+	u32 temp=0;
+ 	//关闭RTC寄存器写保护
+	RTC->WPR=0xCA;
+	RTC->WPR=0x53; 
+	if(RTC_Init_Mode())return 1;//进入RTC初始化模式失败
+	temp=(((u32)week&0X07)<<13)|((u32)RTC_DEC2BCD(year)<<16)|((u32)RTC_DEC2BCD(month)<<8)|(RTC_DEC2BCD(date)); 
+	RTC->DR=temp;
+	RTC->ISR&=~(1<<7);			//退出RTC初始化模式 
+	return 0; 
+}
+//获取RTC时间
+//*hour,*min,*sec:小时,分钟,秒钟 
+//*ampm:AM/PM,0=AM/24H,1=PM.
+void RTC_Get_Time(u8 *hour,u8 *min,u8 *sec,u8 *ampm)
+{
+	u32 temp=0;
+ 	while(RTC_Wait_Synchro());	//等待同步  	 
+	temp=RTC->TR;
+	*hour=RTC_BCD2DEC((temp>>16)&0X3F);
+	*min=RTC_BCD2DEC((temp>>8)&0X7F);
+	*sec=RTC_BCD2DEC(temp&0X7F);
+	*ampm=temp>>22; 
+}
+//获取RTC日期
+//*year,*mon,*date:年,月,日
+//*week:星期
+void RTC_Get_Date(u8 *year,u8 *month,u8 *date,u8 *week)
+{
+	u32 temp=0;
+ 	while(RTC_Wait_Synchro());	//等待同步  	 
+	temp=RTC->DR;
+	*year=RTC_BCD2DEC((temp>>16)&0XFF);
+	*month=RTC_BCD2DEC((temp>>8)&0X1F);
+	*date=RTC_BCD2DEC(temp&0X3F);
+	*week=(temp>>13)&0X07; 
+}
 
 
