@@ -258,6 +258,16 @@ void RTC_WKUP_IRQHandler(void)
 	}   
 	EXTI->PR|=1<<22;	//清除中断线22的中断标志 								
 }
+u8 const table_week[12]={0,3,3,6,1,4,6,2,5,0,3,5}; //月修正数据表	  
+//获得现在是星期几
+//功能描述:输入公历日期得到星期(只允许1901-2099年)
+//year,month,day：公历年月日 
+//返回值：星期号(1~7,代表周1~周日)																						 
+u8 RTC_Get_Week(u16 year,u8 month,u8 day)
+{	
+
+}	
+
 
 
 
