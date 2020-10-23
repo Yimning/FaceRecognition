@@ -2,11 +2,10 @@
 #include "led.h"
 #include "delay.h"
 #include "usart.h" 
-
+//////////////////////////////////////////////////////////////////////////////////	 
 //ALIENTEK STM32F407开发板
 //RTC 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com		  
+//正点原子@ALIENTEK			  
 //********************************************************************************
 //修改说明
 //V1.1 20140726
@@ -30,7 +29,6 @@ u8 RTC_Wait_Synchro(void)
 	RTC->WPR=0xFF;			//使能RTC寄存器写保护  
 	return 0;
 }
-
 //RTC进入初始化模式
 //返回值:0,成功;1,失败;
 u8 RTC_Init_Mode(void)
@@ -86,7 +84,6 @@ u8 RTC_BCD2DEC(u8 val)
 	temp=(val>>4)*10;
 	return (temp+(val&0X0F));
 }
-
 //RTC时间设置
 //hour,min,sec:小时,分钟,秒钟
 //ampm:AM/PM,0=AM/24H,1=PM.
@@ -279,6 +276,8 @@ u8 RTC_Get_Week(u16 year,u8 month,u8 day)
 	if(temp2==0)temp2=7;
 	return temp2;
 }	
+
+
 
 
 
