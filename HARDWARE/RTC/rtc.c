@@ -248,6 +248,20 @@ void RTC_Alarm_IRQHandler(void)
 	EXTI->PR|=1<<17;	//清除中断线17的中断标志 											 
 }
 
+//RTC WAKE UP中断服务函数
+void RTC_WKUP_IRQHandler(void)
+{    
+	if(RTC->ISR&(1<<10))//WK_UP中断?
+	{ 
+		RTC->ISR&=~(1<<10);	//清除中断标志
+		LED1=!LED1; 
+	}   
+	EXTI->PR|=1<<22;	//清除中断线22的中断标志 								
+}
+
+
+
+
 
 
 
