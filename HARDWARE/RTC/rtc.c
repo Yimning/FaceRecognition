@@ -272,7 +272,12 @@ u8 RTC_Get_Week(u16 year,u8 month,u8 day)
 	if (yearH>19)yearL+=100;
 	// 所过闰年数只算1900年之后的  
 	temp2=yearL+yearL/4;
-
+	temp2=temp2%7; 
+	temp2=temp2+day+table_week[month-1];
+	if (yearL%4==0&&month<3)temp2--;
+	temp2%=7;
+	if(temp2==0)temp2=7;
+	return temp2;
 }	
 
 
