@@ -147,5 +147,78 @@ void RTC_Get_Date(u8 *year,u8 *month,u8 *date,u8 *week)
 	*date=RTC_BCD2DEC(temp&0X3F);
 	*week=(temp>>13)&0X07; 
 }
+//RTC初始化
+//返回值:0,初始化成功;
+//       1,LSE开启失败;
+//       2,进入初始化模式失败;
+u8 RTC_Init(void)
+{
+	u16 retry=0X1FFF; 
+	RCC->APB1ENR|=1<<28;			//使能电源接口时钟
+	PWR->CR|=1<<8;					//后备区域访问使能(RTC+SRAM)
+	if(RTC_Read_BKR(0)!=0X5050)		//是否第一次配置?
+	{
+		RCC->BDCR|=1<<0;			//LSE 开启  
+		while(retry&&((RCC->BDCR&0X02)==0))//等待LSE准备好
+		{
+			retry--;
+			delay_ms(5);
+		}
+		if(retry==0)return 1;		//LSE 开启失败. 
+		RCC->BDCR|=1<<8;			//选择LSE,作为RTC的时钟
+		RCC->BDCR|=1<<15;			//使能RTC时钟
+ 		//关闭RTC寄存器写保护
+		RTC->WPR=0xCA;
+		RTC->WPR=0x53; 
+		if(RTC_Init_Mode())return 2;//进入RTC初始化模式
+		RTC->PRER=0XFF;				//RTC同步分频系数(0~7FFF),必须先设置同步分频,再设置异步分频,Frtc=Fclks/((Sprec+1)*(Asprec+1))
+		RTC->PRER|=0X7F<<16;		//RTC异步分频系数(1~0X7F)
+		RTC->CR&=~(1<<6);			//RTC设置为,24小时格式
+		RTC->ISR&=~(1<<7);			//退出RTC初始化模式
+		RTC->WPR=0xFF;				//使能RTC寄存器写保护  
+		RTC_Set_Time(23,59,56,0);	//设置时间
+		RTC_Set_Date(14,5,5,1);		//设置日期
+		//RTC_Set_AlarmA(7,0,0,10);	//设置闹钟时间
+		RTC_Write_BKR(0,0X5050);	//标记已经初始化过了
+	} 
+	//RTC_Set_WakeUp(4,0);			//配置WAKE UP中断,1秒钟中断一次 
+	return 0;
+}
+//设置闹钟时间(按星期闹铃,24小时制)
+//week:星期几(1~7)
+//hour,min,sec:小时,分钟,秒钟
+void RTC_Set_AlarmA(u8 week,u8 hour,u8 min,u8 sec)
+{ 
+	//关闭RTC寄存器写保护
+	RTC->WPR=0xCA; 
+	RTC->WPR=0x53;
+	RTC->CR&=~(1<<8);	//关闭闹钟A
+	while((RTC->ISR&0X01)==0);//等待闹钟A修改允许 
+	RTC->ALRMAR=0;		//清空原来设置
+	RTC->ALRMAR|=1<<30;	//按星期闹铃 
+	RTC->ALRMAR|=0<<22;	//24小时制
+	RTC->ALRMAR|=(u32)RTC_DEC2BCD(week)<<24;//星期设置
+	RTC->ALRMAR|=(u32)RTC_DEC2BCD(hour)<<16;//小时设置
+	RTC->ALRMAR|=(u32)RTC_DEC2BCD(min)<<8;	//分钟设置
+	RTC->ALRMAR|=(u32)RTC_DEC2BCD(sec);		//秒钟设置  
+	RTC->ALRMASSR=0;						//不使用SUB SEC
+	RTC->CR|=1<<12;		//开启闹钟A中断
+	RTC->CR|=1<<8;		//开启闹钟A 
+	RTC->WPR=0XFF;		//禁止修改RTC寄存器 
+	
+	RTC->ISR&=~(1<<8);	//清除RTC闹钟A的标志
+	EXTI->PR=1<<17;  	//清除LINE17上的中断标志位  
+	EXTI->IMR|=1<<17;	//开启line17上的中断 
+	EXTI->RTSR|=1<<17;	//line17上事件上升降沿触发 
+	MY_NVIC_Init(2,2,RTC_Alarm_IRQn,2); //抢占2，子优先级2，组2 
+}
+//周期性唤醒定时器设置
+//wksel:000,RTC/16;001,RTC/8;010,RTC/4;011,RTC/2;
+//      10x,ck_spre,1Hz;11x,1Hz,且cnt值增加2^16(即cnt+2^16)
+//注意:RTC就是RTC的时钟频率,即RTCCLK!
+//cnt:自动重装载值.减到0,产生中断.
+
+
+
 
 
