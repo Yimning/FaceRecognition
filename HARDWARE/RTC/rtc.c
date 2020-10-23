@@ -265,6 +265,13 @@ u8 const table_week[12]={0,3,3,6,1,4,6,2,5,0,3,5}; //月修正数据表
 //返回值：星期号(1~7,代表周1~周日)																						 
 u8 RTC_Get_Week(u16 year,u8 month,u8 day)
 {	
+	u16 temp2;
+	u8 yearH,yearL;
+	yearH=year/100;	yearL=year%100; 
+	// 如果为21世纪,年份数加100  
+	if (yearH>19)yearL+=100;
+	// 所过闰年数只算1900年之后的  
+	temp2=yearL+yearL/4;
 
 }	
 
