@@ -1260,6 +1260,34 @@ void SD_DMA_Config(u32*mbuf,u32 bufsize,u8 dir)
 	DMA2_Stream3->CR|=1<<0;	//开启DMA传输 
 }   
 
+//读SD卡
+//buf:读数据缓存区
+//sector:扇区地址
+//cnt:扇区个数	
+//返回值:错误状态;0,正常;其他,错误代码;				  				 
+u8 SD_ReadDisk(u8*buf,u32 sector,u8 cnt)
+{
+	u8 sta=SD_OK;
+	long long lsector=sector;
+	u8 n;
+	if(CardType!=SDIO_STD_CAPACITY_SD_CARD_V1_1)lsector<<=9;
+	if((u32)buf%4!=0)
+	{
+	 	for(n=0;n<cnt;n++)
+		{
+		 	sta=SD_ReadBlock(SDIO_DATA_BUFFER,lsector+512*n,512);//单个sector的读操作
+			memcpy(buf,SDIO_DATA_BUFFER,512);
+			buf+=512;
+		} 
+	}else
+	{
+		if(cnt==1)sta=SD_ReadBlock(buf,lsector,512);    	//单个sector的读操作
+		else sta=SD_ReadMultiBlocks(buf,lsector,512,cnt);//多个sector  
+	}
+	return sta;
+}
+
+
 
 
 
