@@ -2,14 +2,10 @@
 #include "string.h"	 
 #include "sys.h"	 
 #include "usart.h"	 
-//////////////////////////////////////////////////////////////////////////////////	
-
 //ALIENTEK STM32F407开发板
 //SDIO 驱动代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//All rights reserved		
-//********************************************************************************
 //修改说明
 //V1.1	20140522
 //1,加入超时判断,解决轮询接收死机的问题.
@@ -82,7 +78,6 @@ SD_Error SD_Init(void)
  	}
 	return errorstatus;		 
 }
-
 //SDIO时钟初始化设置
 //clkdiv:时钟分频系数
 //CK时钟=SDIOCLK/[clkdiv+2];(SDIOCLK时钟固定为48Mhz)
@@ -1259,7 +1254,6 @@ void SD_DMA_Config(u32*mbuf,u32 bufsize,u8 dir)
 	DMA2_Stream3->CR|=1<<5;	//外设流控制 
 	DMA2_Stream3->CR|=1<<0;	//开启DMA传输 
 }   
-
 //读SD卡
 //buf:读数据缓存区
 //sector:扇区地址
@@ -1312,12 +1306,6 @@ u8 SD_WriteDisk(u8*buf,u32 sector,u8 cnt)
 	}
 	return sta;
 }
-
-
-
-
-
-
 
 
 
