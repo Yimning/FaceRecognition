@@ -1225,6 +1225,43 @@ u8 convert_from_bytes_to_power_of_two(u16 NumberOfBytes)
 	}
 	return count;
 } 	 
+//配置SDIO DMA  
+//mbuf:存储器地址
+//bufsize:传输数据量
+//dir:方向;1,存储器-->SDIO(写数据);0,SDIO-->存储器(读数据);
+void SD_DMA_Config(u32*mbuf,u32 bufsize,u8 dir)
+{		 
+ 	u32 tmpreg=0;//重新设置
+	while(DMA2_Stream3->CR&0X01);	//等待DMA可配置 
+	DMA2->LIFCR|=0X3D<<22;			//清空之前该stream3上的所有中断标志
+	
+	
+	DMA2_Stream3->PAR=(u32)&SDIO->FIFO;	//DMA2 外设地址
+	DMA2_Stream3->M0AR=(u32)mbuf; 	//DMA2,存储器0地址;	 
+	DMA2_Stream3->NDTR=0; 			//DMA2,传输数据量0,外设流控制 
+	tmpreg|=dir<<6;		//数据传输方向控制
+	tmpreg|=0<<8;		//非循环模式(即使用普通模式)
+	tmpreg|=0<<9;		//外设非增量模式
+	tmpreg|=1<<10;		//存储器增量模式
+	tmpreg|=2<<11;		//外设数据长度:32位
+	tmpreg|=2<<13;		//存储器数据长度:32位
+	tmpreg|=3<<16;		//最高优先级
+	tmpreg|=1<<21;		//外设突发4次传输
+	tmpreg|=1<<23;		//存储器突发4次传输
+	tmpreg|=(u32)4<<25;	//通道选择
+	DMA2_Stream3->CR=tmpreg; 
+	
+	tmpreg=DMA2_Stream3->FCR;
+	tmpreg&=0XFFFFFFF8;	//清除DMDIS和FTH
+	tmpreg|=1<<2;		//FIFO使能
+	tmpreg|=3<<0;		//全FIFO
+	DMA2_Stream3->FCR=tmpreg;
+	DMA2_Stream3->CR|=1<<5;	//外设流控制 
+	DMA2_Stream3->CR|=1<<0;	//开启DMA传输 
+}   
+
+
+
 
 
 
