@@ -1286,6 +1286,32 @@ u8 SD_ReadDisk(u8*buf,u32 sector,u8 cnt)
 	}
 	return sta;
 }
+//写SD卡
+//buf:写数据缓存区
+//sector:扇区地址
+//cnt:扇区个数	
+//返回值:错误状态;0,正常;其他,错误代码;	
+u8 SD_WriteDisk(u8*buf,u32 sector,u8 cnt)
+{
+	u8 sta=SD_OK;
+	u8 n;
+	long long lsector=sector;
+	if(CardType!=SDIO_STD_CAPACITY_SD_CARD_V1_1)lsector<<=9;
+	if((u32)buf%4!=0)
+	{
+	 	for(n=0;n<cnt;n++)
+		{
+			memcpy(SDIO_DATA_BUFFER,buf,512);
+		 	sta=SD_WriteBlock(SDIO_DATA_BUFFER,lsector+512*n,512);//单个sector的写操作
+			buf+=512;
+		} 
+	}else
+	{
+		if(cnt==1)sta=SD_WriteBlock(buf,lsector,512);    	//单个sector的写操作
+		else sta=SD_WriteMultiBlocks(buf,lsector,512,cnt);	//多个sector  
+	}
+	return sta;
+}
 
 
 
