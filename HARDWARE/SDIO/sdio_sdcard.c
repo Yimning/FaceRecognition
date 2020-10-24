@@ -1,12 +1,13 @@
 #include "sdio_sdcard.h"
 #include "string.h"	 
 #include "sys.h"	 
-#include "usart.h"	   
-
+#include "usart.h"	 
+//////////////////////////////////////////////////////////////////////////////////	 
 //ALIENTEK STM32F407开发板
 //SDIO 驱动代码	   
 //正点原子@ALIENTEK
-//技术论坛:www.openedv.com
+//技术论坛:www.openedv.com	
+//********************************************************************************
 
 //修改说明
 //V1.1	20140522
