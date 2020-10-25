@@ -51,6 +51,20 @@ void SPI1_SetSpeed(u8 SpeedSet)
 	SPI1->CR1|=1<<6; 		//SPI设备使能	  
 } 
 //SPI1 读写一个字节
+//TxData:要写入的字节
+//返回值:读取到的字节
+u8 SPI1_ReadWriteByte(u8 TxData)
+{		 			 
+	while((SPI1->SR&1<<1)==0);		//等待发送区空 
+	SPI1->DR=TxData;	 	  		//发送一个byte  
+	while((SPI1->SR&1<<0)==0);		//等待接收完一个byte  
+ 	return SPI1->DR;          		//返回收到的数据				    
+}
+
+
+
+
+
 
 
 
