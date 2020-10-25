@@ -43,10 +43,14 @@ void SPI1_Init(void)
 //SpeedSet:0~7
 //SPI速度=fAPB2/2^(SpeedSet+1)
 //fAPB2时钟一般为84Mhz
-
-
-
-
+void SPI1_SetSpeed(u8 SpeedSet)
+{
+	SpeedSet&=0X07;			//限制范围
+	SPI1->CR1&=0XFFC7; 
+	SPI1->CR1|=SpeedSet<<3;	//设置SPI1速度  
+	SPI1->CR1|=1<<6; 		//SPI设备使能	  
+} 
+//SPI1 读写一个字节
 
 
 
