@@ -1,12 +1,6 @@
-
 #include "spi.h"
 
-//ALIENTEK STM32F407开发板
-//SPI 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//All rights reserved									  
-////////////////////////////////////////////////////////////////////////////////// 	 
+
 
 //以下是SPI模块的初始化代码，配置成主机模式 						  
 //SPI口初始化
@@ -60,20 +54,6 @@ u8 SPI1_ReadWriteByte(u8 TxData)
 	while((SPI1->SR&1<<0)==0);		//等待接收完一个byte  
  	return SPI1->DR;          		//返回收到的数据				    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
