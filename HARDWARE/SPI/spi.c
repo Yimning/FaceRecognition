@@ -39,6 +39,11 @@ void SPI1_Init(void)
 	SPI1->I2SCFGR&=~(1<<11);//选择SPI模式
 	SPI1_ReadWriteByte(0xff);//启动传输		 
 }   
+//SPI1速度设置函数
+//SpeedSet:0~7
+//SPI速度=fAPB2/2^(SpeedSet+1)
+//fAPB2时钟一般为84Mhz
+
 
 
 
