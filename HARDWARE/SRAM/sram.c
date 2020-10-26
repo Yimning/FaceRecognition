@@ -127,6 +127,15 @@ void fsmc_sram_test_write(u32 addr,u8 data)
 {			   
 	FSMC_SRAM_WriteBuffer(&data,addr,1);//写入1个字节
 }
+//读取1个字节
+//addr:要读取的地址
+//返回值:读取到的数据
+u8 fsmc_sram_test_read(u32 addr)
+{
+	u8 data;
+	FSMC_SRAM_ReadBuffer(&data,addr,1);
+	return data;
+}
 
 
 
