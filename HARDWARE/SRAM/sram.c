@@ -73,6 +73,8 @@ void FSMC_SRAM_Init(void)
  	GPIO_AF_Set(GPIOG,5,12);	//PG5,AF12 	
 
 
+	
+	
 
 
 
