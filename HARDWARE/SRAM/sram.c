@@ -73,6 +73,41 @@ void FSMC_SRAM_Init(void)
  	GPIO_AF_Set(GPIOG,5,12);	//PG5,AF12 	
 
 
+	
+	//寄存器清零
+	//bank1有NE1~4,每一个有一个BCR+TCR，所以总共八个寄存器。
+	//这里我们使用NE3 ，也就对应BTCR[4],[5]。				    
+	FSMC_Bank1->BTCR[4]=0X00000000;
+	FSMC_Bank1->BTCR[5]=0X00000000;
+	FSMC_Bank1E->BWTR[4]=0X00000000;
+	//操作BCR寄存器	使用异步模式,模式A(读写共用一个时序寄存器)
+	//BTCR[偶数]:BCR寄存器;BTCR[奇数]:BTR寄存器
+	FSMC_Bank1->BTCR[4]|=1<<12;//存储器写使能
+	FSMC_Bank1->BTCR[4]|=1<<4; //存储器数据宽度为16bit 	    
+	//操作BTR寄存器			（HCLK=168M, 1个HCLK=6ns			    
+	FSMC_Bank1->BTCR[5]|=8<<8; //数据保持时间（DATAST）为9个HCLK 6*9=54ns	 	 
+	FSMC_Bank1->BTCR[5]|=0<<4; //地址保持时间（ADDHLD）未用到	  	 
+	FSMC_Bank1->BTCR[5]|=0<<0; //地址建立时间（ADDSET）为0个HCLK 0ns	 	 
+	//闪存写时序寄存器  
+	FSMC_Bank1E->BWTR[4]=0x0FFFFFFF;//默认值
+	//使能BANK1区域3
+	FSMC_Bank1->BTCR[4]|=1<<0; 	
+} 														  
+//在指定地址(WriteAddr+Bank1_SRAM3_ADDR)开始,连续写入n个字节.
+//pBuffer:字节指针
+//WriteAddr:要写入的地址
+//n:要写入的字节数
+void FSMC_SRAM_WriteBuffer(u8* pBuffer,u32 WriteAddr,u32 n)
+{
+	for(;n!=0;n--)  
+	{										    
+		*(vu8*)(Bank1_SRAM3_ADDR+WriteAddr)=*pBuffer;	  
+		WriteAddr++;
+		pBuffer++;
+	}   
+}																			    
+
+
 
 	
 	
