@@ -189,5 +189,14 @@ void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)
 	}
 }
 
+//////////////////////////////////////////测试用///////////////////////////////////////////
+//WriteAddr:起始地址
+//WriteData:要写入的数据
+void Test_Write(u32 WriteAddr,u32 WriteData)   	
+{
+	STMFLASH_Write(WriteAddr,&WriteData,1);//写入一个字 
+}
+ 
+
 
 
