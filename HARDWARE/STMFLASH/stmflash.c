@@ -1,7 +1,7 @@
 #include "stmflash.h"
 #include "delay.h"
 #include "usart.h" 
-//////////////////////////////////////////////////////////////////////////////////	 
+
 //ALIENTEK STM32F407开发板
 //STM32内部FLASH读写 驱动代码	   
 //正点原子@ALIENTEK
@@ -108,7 +108,6 @@ u32 STMFLASH_ReadWord(u32 faddr)
 {
 	return *(vu32*)faddr; 
 }  
-
 //获取某个地址所在的flash扇区
 //addr:flash地址
 //返回值:0~11,即addr所在的扇区
@@ -174,7 +173,6 @@ void STMFLASH_Write(u32 WriteAddr,u32 *pBuffer,u32 NumToWrite)
 	STMFLASH_Lock();//上锁
 } 
 
-
 //从指定地址开始读出指定长度的数据
 //ReadAddr:起始地址
 //pBuffer:数据指针
@@ -197,6 +195,16 @@ void Test_Write(u32 WriteAddr,u32 WriteData)
 	STMFLASH_Write(WriteAddr,&WriteData,1);//写入一个字 
 }
  
+
+
+
+
+
+
+
+
+
+
 
 
 
