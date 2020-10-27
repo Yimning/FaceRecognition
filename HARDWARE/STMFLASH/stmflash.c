@@ -175,3 +175,19 @@ void STMFLASH_Write(u32 WriteAddr,u32 *pBuffer,u32 NumToWrite)
 } 
 
 
+//从指定地址开始读出指定长度的数据
+//ReadAddr:起始地址
+//pBuffer:数据指针
+//NumToRead:字(32位)数
+void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)   	
+{
+	u32 i;
+	for(i=0;i<NumToRead;i++)
+	{
+		pBuffer[i]=STMFLASH_ReadWord(ReadAddr);//读取4个字节.
+		ReadAddr+=4;//偏移4个字节.	
+	}
+}
+
+
+
