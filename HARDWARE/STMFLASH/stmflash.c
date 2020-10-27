@@ -108,10 +108,24 @@ u32 STMFLASH_ReadWord(u32 faddr)
 {
 	return *(vu32*)faddr; 
 }  
-
-
-
-
+//获取某个地址所在的flash扇区
+//addr:flash地址
+//返回值:0~11,即addr所在的扇区
+u8 STMFLASH_GetFlashSector(u32 addr)
+{
+	if(addr<ADDR_FLASH_SECTOR_1)return 0;
+	else if(addr<ADDR_FLASH_SECTOR_2)return 1;
+	else if(addr<ADDR_FLASH_SECTOR_3)return 2;
+	else if(addr<ADDR_FLASH_SECTOR_4)return 3;
+	else if(addr<ADDR_FLASH_SECTOR_5)return 4;
+	else if(addr<ADDR_FLASH_SECTOR_6)return 5;
+	else if(addr<ADDR_FLASH_SECTOR_7)return 6;
+	else if(addr<ADDR_FLASH_SECTOR_8)return 7;
+	else if(addr<ADDR_FLASH_SECTOR_9)return 8;
+	else if(addr<ADDR_FLASH_SECTOR_10)return 9;
+	else if(addr<ADDR_FLASH_SECTOR_11)return 10; 
+	return 11;	
+}
 
 
 
