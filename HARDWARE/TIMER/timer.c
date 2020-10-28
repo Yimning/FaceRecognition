@@ -95,6 +95,54 @@ void TIM5_CH1_Cap_Init(u32 arr,u16 psc)
 u8  TIM5CH1_CAPTURE_STA=0;	//输入捕获状态		    				
 u32	TIM5CH1_CAPTURE_VAL;	//输入捕获值(TIM2/TIM5是32位)
 //定时器5中断服务程序	 
+void TIM5_IRQHandler(void)
+{ 		    
+	u16 tsr;
+	tsr=TIM5->SR;
+ 	if((TIM5CH1_CAPTURE_STA&0X80)==0)//还未成功捕获	
+	{
+		if(tsr&0X01)//溢出
+		{	     
+			if(TIM5CH1_CAPTURE_STA&0X40)//已经捕获到高电平了
+			{
+				if((TIM5CH1_CAPTURE_STA&0X3F)==0X3F)//高电平太长了
+				{
+					TIM5CH1_CAPTURE_STA|=0X80;		//标记成功捕获了一次
+					TIM5CH1_CAPTURE_VAL=0XFFFFFFFF;
+				}else TIM5CH1_CAPTURE_STA++;
+			}	 
+		}
+		if(tsr&0x02)//捕获1发生捕获事件
+		{	
+			if(TIM5CH1_CAPTURE_STA&0X40)		//捕获到一个下降沿 		
+			{	  			
+				TIM5CH1_CAPTURE_STA|=0X80;		//标记成功捕获到一次高电平脉宽
+			    TIM5CH1_CAPTURE_VAL=TIM5->CCR1;	//获取当前的捕获值.
+	 			TIM5->CCER&=~(1<<1);			//CC1P=0 设置为上升沿捕获
+			}else  								//还未开始,第一次捕获上升沿
+			{
+				TIM5CH1_CAPTURE_STA=0;			//清空
+				TIM5CH1_CAPTURE_VAL=0;
+				TIM5CH1_CAPTURE_STA|=0X40;		//标记捕获到了上升沿
+				TIM5->CR1&=~(1<<0)		;    	//使能定时器2
+	 			TIM5->CNT=0;					//计数器清空
+	 			TIM5->CCER|=1<<1; 				//CC1P=1 设置为下降沿捕获
+				TIM5->CR1|=0x01;    			//使能定时器2
+			}		    
+		}			     	    					   
+ 	}
+	TIM5->SR=0;//清除中断标志位   
+}
+//TIM9 CH2 PWM输出设置 
+//PWM输出初始化
+//arr：自动重装值
+//psc：时钟预分频数
+void TIM9_CH2_PWM_Init(u16 arr,u16 psc)
+{		 					 
+
+} 
+
+
 
 
 
