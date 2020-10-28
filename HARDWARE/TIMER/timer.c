@@ -39,6 +39,55 @@ void TIM3_Int_Init(u16 arr,u16 psc)
   	MY_NVIC_Init(1,3,TIM3_IRQn,2);	//抢占1，子优先级3，组2									 
 }
 
+//TIM14 PWM部分初始化 
+//PWM输出初始化
+//arr：自动重装值
+//psc：时钟预分频数
+void TIM14_PWM_Init(u32 arr,u32 psc)
+{		 					 
+	//此部分需手动修改IO口设置
+	RCC->APB1ENR|=1<<8; 	//TIM14时钟使能    
+	RCC->AHB1ENR|=1<<5;   	//使能PORTF时钟	
+	GPIO_Set(GPIOF,PIN9,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU);//复用功能,上拉输出
+	GPIO_AF_Set(GPIOF,9,9);	//PF9,AF9 
+	
+	TIM14->ARR=arr;			//设定计数器自动重装值 
+	TIM14->PSC=psc;			//预分频器不分频 
+	TIM14->CCMR1|=6<<4;  	//CH1 PWM1模式		 
+	TIM14->CCMR2|=1<<3; 	//CH1 预装载使能	   
+	TIM14->CCER|=1<<0;   	//OC1 输出使能	
+	TIM14->CCER|=1<<1;   	//OC1 低电平有效	   
+	TIM14->CR1|=1<<7;   	//ARPE使能 
+	TIM14->CR1|=1<<0;    	//使能定时器14 											  
+}  
+
+//定时器2通道1输入捕获配置
+//arr：自动重装值(TIM2,TIM5是32位的!!)
+//psc：时钟预分频数
+void TIM5_CH1_Cap_Init(u32 arr,u16 psc)
+{		 
+	RCC->APB1ENR|=1<<3;   	//TIM5 时钟使能 
+	RCC->AHB1ENR|=1<<0;   	//使能PORTA时钟	
+	GPIO_Set(GPIOA,PIN0,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PD);//复用功能,下拉
+	GPIO_AF_Set(GPIOA,0,2);	//PA0,AF2
+	  
+ 	TIM5->ARR=arr;  		//设定计数器自动重装值   
+	TIM5->PSC=psc;  		//预分频器 
+
+	TIM5->CCMR1|=1<<0;		//CC1S=01 	选择输入端 IC1映射到TI1上
+ 	TIM5->CCMR1|=0<<4; 		//IC1F=0000 配置输入滤波器 不滤波
+ 	TIM5->CCMR1|=0<<10; 	//IC2PS=00 	配置输入分频,不分频 
+
+	TIM5->CCER|=0<<1; 		//CC1P=0	上升沿捕获
+	TIM5->CCER|=1<<0; 		//CC1E=1 	允许捕获计数器的值到捕获寄存器中
+
+	TIM5->EGR=1<<0;			//软件控制产生更新事件,使写入PSC的值立即生效,否则将会要等到定时器溢出才会生效!
+	TIM5->DIER|=1<<1;   	//允许捕获1中断				
+	TIM5->DIER|=1<<0;   	//允许更新中断	
+	TIM5->CR1|=0x01;    	//使能定时器2
+	MY_NVIC_Init(2,0,TIM5_IRQn,2);//抢占2，子优先级0，组2	   
+}
+
 
 
 
