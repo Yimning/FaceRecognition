@@ -6,9 +6,6 @@
 //定时器 驱动代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-////////////////////////////////////////////////////////////////////////////////// 	
-
-
 
 
 extern int reg_time;
@@ -87,7 +84,6 @@ void TIM5_CH1_Cap_Init(u32 arr,u16 psc)
 	TIM5->CR1|=0x01;    	//使能定时器2
 	MY_NVIC_Init(2,0,TIM5_IRQn,2);//抢占2，子优先级0，组2	   
 }
-
 //捕获状态
 //[7]:0,没有成功的捕获;1,成功捕获到一次.
 //[6]:0,还没捕获到低电平;1,已经捕获到低电平了.
@@ -139,8 +135,22 @@ void TIM5_IRQHandler(void)
 //psc：时钟预分频数
 void TIM9_CH2_PWM_Init(u16 arr,u16 psc)
 {		 					 
-
+	RCC->APB2ENR|=1<<16;   	//TIM9 时钟使能 
+	RCC->AHB1ENR|=1<<0;   	//使能PORTA时钟	
+	GPIO_Set(GPIOA,PIN3,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU);//PA3,复用功能,上拉
+	GPIO_AF_Set(GPIOA,3,3);	//PA3,AF3
+ 	TIM9->ARR=arr;  		//设定计数器自动重装值   
+	TIM9->PSC=psc;  		//预分频器 
+	TIM9->CCMR1|=6<<12;  	//CH2 PWM1模式		 
+	TIM9->CCMR1|=1<<11; 	//CH2 预装载使能	
+	TIM9->CCER|=1<<4;   	//OC2 输出使能	  
+	TIM9->CR1|=1<<7;   		//ARPE使能 
+	TIM9->CR1|=1<<0;    	//使能定时器9 
 } 
+
+
+
+
 
 
 
