@@ -112,6 +112,17 @@ void CT_IIC_Send_Byte(u8 txd)
 //读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
 u8 CT_IIC_Read_Byte(unsigned char ack)
 {
+	u8 i,receive=0;
+ 	CT_SDA_IN();//SDA设置为输入
+	delay_us(30);
+	for(i=0;i<8;i++ )
+	{ 
+		CT_IIC_SCL=0; 	    	   
+		CT_Delay();
+		CT_IIC_SCL=1;	 
+		receive<<=1;
+		if(CT_READ_SDA)receive++;   
+	}	  				 
 
 }
 
