@@ -92,6 +92,23 @@ void CT_IIC_NAck(void)
 //返回从机有无应答
 //1，有应答
 //0，无应答			  
+void CT_IIC_Send_Byte(u8 txd)
+{                        
+    u8 t;   
+	CT_SDA_OUT(); 	    
+    CT_IIC_SCL=0;//拉低时钟开始数据传输
+	CT_Delay();
+	for(t=0;t<8;t++)
+    {              
+        CT_IIC_SDA=(txd&0x80)>>7;
+        txd<<=1; 	      
+		CT_IIC_SCL=1; 
+		CT_Delay();
+		CT_IIC_SCL=0;	
+		CT_Delay();
+    }	 
+} 	    
+//读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
 
 
 
