@@ -1,10 +1,16 @@
 #include "ctiic.h"
 #include "delay.h"	 
-//////////////////////////////////////////////////////////////////////////////////	 
+
 //ALIENTEK STM32F407开发板
 //电容触摸屏-IIC 驱动代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
+
+//修改说明
+//V1.1 20140721
+//1,修改CT_IIC_Read_Byte函数,读数据更快.
+//2,修改CT_IIC_Wait_Ack函数,以支持MDK的-O2优化.
+////////////////////////////////////////////////////////////////////////////////// 	
 
 //控制I2C速度的延时
 void CT_Delay(void)
@@ -75,7 +81,6 @@ void CT_IIC_Ack(void)
 	CT_Delay();
 	CT_IIC_SCL=0;
 }
-
 //不产生ACK应答		    
 void CT_IIC_NAck(void)
 {
@@ -108,7 +113,6 @@ void CT_IIC_Send_Byte(u8 txd)
 		CT_Delay();
     }	 
 } 	    
-
 //读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
 u8 CT_IIC_Read_Byte(unsigned char ack)
 {
@@ -127,7 +131,6 @@ u8 CT_IIC_Read_Byte(unsigned char ack)
 	else CT_IIC_Ack(); //发送ACK   
  	return receive;
 }
-
 
 
 
