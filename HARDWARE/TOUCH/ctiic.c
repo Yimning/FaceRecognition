@@ -108,8 +108,6 @@ void CT_IIC_Send_Byte(u8 txd)
 		CT_Delay();
     }	 
 } 	    
-//读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
-
 
 
 
