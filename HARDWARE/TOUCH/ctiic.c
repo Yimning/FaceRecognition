@@ -123,7 +123,9 @@ u8 CT_IIC_Read_Byte(unsigned char ack)
 		receive<<=1;
 		if(CT_READ_SDA)receive++;   
 	}	  				 
-
+	if (!ack)CT_IIC_NAck();//发送nACK
+	else CT_IIC_Ack(); //发送ACK   
+ 	return receive;
 }
 
 
