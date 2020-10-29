@@ -76,6 +76,22 @@ void CT_IIC_Ack(void)
 	CT_IIC_SCL=0;
 }
 
+//不产生ACK应答		    
+void CT_IIC_NAck(void)
+{
+	CT_IIC_SCL=0;
+	CT_SDA_OUT();
+	CT_Delay();
+	CT_IIC_SDA=1;
+	CT_Delay();
+	CT_IIC_SCL=1;
+	CT_Delay();
+	CT_IIC_SCL=0;
+}					 				     
+//IIC发送一个字节
+//返回从机有无应答
+//1，有应答
+//0，无应答			  
 
 
 
