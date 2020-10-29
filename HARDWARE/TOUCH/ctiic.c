@@ -109,6 +109,12 @@ void CT_IIC_Send_Byte(u8 txd)
     }	 
 } 	    
 
+//读1个字节，ack=1时，发送ACK，ack=0，发送nACK   
+u8 CT_IIC_Read_Byte(unsigned char ack)
+{
+
+}
+
 
 
 
