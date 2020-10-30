@@ -93,6 +93,42 @@ const u16 FT5206_TPX_TBL[5]={FT_TP1_REG,FT_TP2_REG,FT_TP3_REG,FT_TP4_REG,FT_TP5_
 //0,触屏无触摸;1,触屏有触摸
 u8 FT5206_Scan(u8 mode)
 {
+	u8 buf[4];
+	u8 i=0;
+	u8 res=0;
+	u8 temp;
+	static u8 t=0;//控制查询间隔,从而降低CPU占用率   
+	t++;
+	if((t%10)==0||t<10)//空闲时,每进入10次CTP_Scan函数才检测1次,从而节省CPU使用率
+	{
+		FT5206_RD_Reg(FT_REG_NUM_FINGER,&mode,1);//读取触摸点的状态  
+		if((mode&0XF)&&((mode&0XF)<6))
+		{
+			temp=0XFF<<(mode&0XF);//将点的个数转换为1的位数,匹配tp_dev.sta定义 
+			tp_dev.sta=(~temp)|TP_PRES_DOWN|TP_CATH_PRES; 
+			for(i=0;i<5;i++)
+			{
+				if(tp_dev.sta&(1<<i))	//触摸有效?
+				{
+					FT5206_RD_Reg(FT5206_TPX_TBL[i],buf,4);	//读取XY坐标值 
+					if(tp_dev.touchtype&0X01)//横屏
+					{
+						tp_dev.y[i]=((u16)(buf[0]&0X0F)<<8)+buf[1];
+						tp_dev.x[i]=((u16)(buf[2]&0X0F)<<8)+buf[3];
+					}else
+					{
+						tp_dev.x[i]=480-(((u16)(buf[0]&0X0F)<<8)+buf[1]);
+						tp_dev.y[i]=((u16)(buf[2]&0X0F)<<8)+buf[3];
+					}  
+					if((buf[0]&0XF0)!=0X80)tp_dev.x[i]=tp_dev.y[i]=0;//必须是contact事件，才认为有效
+					//printf("x[%d]:%d,y[%d]:%d\r\n",i,tp_dev.x[i],i,tp_dev.y[i]);
+				}			
+			} 
+			res=1;
+			if(tp_dev.x[0]==0 && tp_dev.y[0]==0)mode=0;	//读到的数据都是0,则忽略此次数据
+			t=0;		//触发一次,则会最少连续监测10次,从而提高命中率
+		}
+	}
 
 }
  
