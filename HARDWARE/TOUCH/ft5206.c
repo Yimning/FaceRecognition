@@ -88,6 +88,9 @@ u8 FT5206_Init(void)
 }
 const u16 FT5206_TPX_TBL[5]={FT_TP1_REG,FT_TP2_REG,FT_TP3_REG,FT_TP4_REG,FT_TP5_REG};
 //扫描触摸屏(采用查询方式)
+//mode:0,正常扫描.
+
+
 
 
 
