@@ -129,7 +129,20 @@ u8 FT5206_Scan(u8 mode)
 			t=0;		//触发一次,则会最少连续监测10次,从而提高命中率
 		}
 	}
-
+	if((mode&0X1F)==0)//无触摸点按下
+	{ 
+		if(tp_dev.sta&TP_PRES_DOWN)	//之前是被按下的
+		{
+			tp_dev.sta&=~(1<<7);	//标记按键松开
+		}else						//之前就没有被按下
+		{ 
+			tp_dev.x[0]=0xffff;
+			tp_dev.y[0]=0xffff;
+			tp_dev.sta&=0XE0;	//清除点有效标记	
+		}	 
+	} 	
+	if(t>240)t=10;//重新从10开始计数
+	return res;
 }
  
 
