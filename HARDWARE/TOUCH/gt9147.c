@@ -142,6 +142,10 @@ u8 GT9147_Init(void)
 }
 
 
+const u16 GT9147_TPX_TBL[5]={GT_TP1_REG,GT_TP2_REG,GT_TP3_REG,GT_TP4_REG,GT_TP5_REG};
+
+
+
 
 
 
