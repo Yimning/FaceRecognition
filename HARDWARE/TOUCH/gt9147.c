@@ -5,12 +5,13 @@
 #include "delay.h" 
 #include "string.h" 
 #include "lcd.h" 
-//////////////////////////////////////////////////////////////////////////////////	 、
+
 //ALIENTEK STM32开发板
 //4.3寸电容触摸屏-GT9147 驱动代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
 
+//*******************************************************************************
 //修改信息
 //V1.1 20150320
 //修改GT9147_Scan函数,添加对非法数据的处理,防止非法数据干扰
@@ -140,8 +141,6 @@ u8 GT9147_Init(void)
 	} 
 	return 1;
 }
-
-
 const u16 GT9147_TPX_TBL[5]={GT_TP1_REG,GT_TP2_REG,GT_TP3_REG,GT_TP4_REG,GT_TP5_REG};
 //扫描触摸屏(采用查询方式)
 //mode:0,正常扫描.
@@ -206,14 +205,19 @@ u8 GT9147_Scan(u8 mode)
 			}else t=0;					//触发一次,则会最少连续监测10次,从而提高命中率
 		}
 	}
-
+	if((mode&0X8F)==0X80)//无触摸点按下
+	{ 
+		if(tp_dev.sta&TP_PRES_DOWN)	//之前是被按下的
+		{
+			tp_dev.sta&=~(1<<7);	//标记按键松开
+		}else						//之前就没有被按下
+		{ 
+			tp_dev.x[0]=0xffff;
+			tp_dev.y[0]=0xffff;
+			tp_dev.sta&=0XE0;	//清除点有效标记	
+		}	 
+	} 	
+	if(t>240)t=10;//重新从10开始计数
+	return res;
 }
  
-
-
-
-
-
-
-
-
