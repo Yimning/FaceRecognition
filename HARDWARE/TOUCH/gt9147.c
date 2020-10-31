@@ -56,6 +56,114 @@ u8 GT9147_Send_Cfg(u8 mode)
 	GT9147_WR_Reg(GT_CHECK_REG,buf,2);//写入校验和,和配置更新标记
 	return 0;
 } 
+//向GT9147写入一次数据
+//reg:起始寄存器地址
+//buf:数据缓缓存区
+//len:写数据长度
+//返回值:0,成功;1,失败.
+u8 GT9147_WR_Reg(u16 reg,u8 *buf,u8 len)
+{
+	u8 i;
+	u8 ret=0;
+	CT_IIC_Start();	
+ 	CT_IIC_Send_Byte(GT_CMD_WR);   	//发送写命令 	 
+	CT_IIC_Wait_Ack();
+	CT_IIC_Send_Byte(reg>>8);   	//发送高8位地址
+	CT_IIC_Wait_Ack(); 	 										  		   
+	CT_IIC_Send_Byte(reg&0XFF);   	//发送低8位地址
+	CT_IIC_Wait_Ack();  
+	for(i=0;i<len;i++)
+	{	   
+    	CT_IIC_Send_Byte(buf[i]);  	//发数据
+		ret=CT_IIC_Wait_Ack();
+		if(ret)break;  
+	}
+    CT_IIC_Stop();					//产生一个停止条件	    
+	return ret; 
+}
+//从GT9147读出一次数据
+//reg:起始寄存器地址
+//buf:数据缓缓存区
+//len:读数据长度			  
+void GT9147_RD_Reg(u16 reg,u8 *buf,u8 len)
+{
+	u8 i; 
+ 	CT_IIC_Start();	
+ 	CT_IIC_Send_Byte(GT_CMD_WR);   //发送写命令 	 
+	CT_IIC_Wait_Ack();
+ 	CT_IIC_Send_Byte(reg>>8);   	//发送高8位地址
+	CT_IIC_Wait_Ack(); 	 										  		   
+ 	CT_IIC_Send_Byte(reg&0XFF);   	//发送低8位地址
+	CT_IIC_Wait_Ack();  
+ 	CT_IIC_Start();  	 	   
+	CT_IIC_Send_Byte(GT_CMD_RD);   //发送读命令		   
+	CT_IIC_Wait_Ack();	   
+	for(i=0;i<len;i++)
+	{	   
+    	buf[i]=CT_IIC_Read_Byte(i==(len-1)?0:1); //发数据	  
+	} 
+    CT_IIC_Stop();//产生一个停止条件    
+} 
+//初始化GT9147触摸屏
+//返回值:0,初始化成功;1,初始化失败 
+u8 GT9147_Init(void)
+{
+	u8 temp[5]; 
+	RCC->AHB1ENR|=1<<1;    	//使能PORTB时钟 
+	RCC->AHB1ENR|=1<<2;    	//使能PORTC时钟  
+	GPIO_Set(GPIOB,PIN1,GPIO_MODE_IN,0,0,GPIO_PUPD_PU);	//PB1设置为上拉输入
+	GPIO_Set(GPIOC,PIN13,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU); //PC13设置为推挽输出
+	CT_IIC_Init();      	//初始化电容屏的I2C总线  
+	GT_RST=0;				//复位
+	delay_ms(10);
+ 	GT_RST=1;				//释放复位		    
+	delay_ms(10); 
+	GPIO_Set(GPIOB,PIN1,GPIO_MODE_IN,0,0,GPIO_PUPD_NONE);//PB1设置为浮空输入
+	delay_ms(100);  
+	GT9147_RD_Reg(GT_PID_REG,temp,4);//读取产品ID
+	temp[4]=0;
+	printf("CTP ID:%s\r\n",temp);	//打印ID
+	if(strcmp((char*)temp,"9147")==0)//ID==9147
+	{
+		temp[0]=0X02;			
+		GT9147_WR_Reg(GT_CTRL_REG,temp,1);//软复位GT9147
+		GT9147_RD_Reg(GT_CFGS_REG,temp,1);//读取GT_CFGS_REG寄存器
+		if(temp[0]<0X60)//默认版本比较低,需要更新flash配置
+		{
+			printf("Default Ver:%d\r\n",temp[0]);
+			GT9147_Send_Cfg(1);//更新并保存配置
+		}
+		delay_ms(10);
+		temp[0]=0X00;	 
+		GT9147_WR_Reg(GT_CTRL_REG,temp,1);//结束复位   
+		return 0;
+	} 
+	return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
