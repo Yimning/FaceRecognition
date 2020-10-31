@@ -143,6 +143,74 @@ u8 GT9147_Init(void)
 
 
 const u16 GT9147_TPX_TBL[5]={GT_TP1_REG,GT_TP2_REG,GT_TP3_REG,GT_TP4_REG,GT_TP5_REG};
+//扫描触摸屏(采用查询方式)
+//mode:0,正常扫描.
+//返回值:当前触屏状态.
+//0,触屏无触摸;1,触屏有触摸
+u8 GT9147_Scan(u8 mode)
+{
+	u8 buf[4];
+	u8 i=0;
+	u8 res=0;
+	u8 temp;
+	u8 tempsta;
+ 	static u8 t=0;//控制查询间隔,从而降低CPU占用率   
+	t++;
+	if((t%10)==0||t<10)//空闲时,每进入10次CTP_Scan函数才检测1次,从而节省CPU使用率
+	{
+		GT9147_RD_Reg(GT_GSTID_REG,&mode,1);	//读取触摸点的状态  
+ 		if(mode&0X80&&((mode&0XF)<6))
+		{
+			temp=0;
+			GT9147_WR_Reg(GT_GSTID_REG,&temp,1);//清标志 		
+		}		
+		if((mode&0XF)&&((mode&0XF)<6))
+		{
+			temp=0XFF<<(mode&0XF);		//将点的个数转换为1的位数,匹配tp_dev.sta定义 
+			tempsta=tp_dev.sta;			//保存当前的tp_dev.sta值
+			tp_dev.sta=(~temp)|TP_PRES_DOWN|TP_CATH_PRES; 
+			tp_dev.x[4]=tp_dev.x[0];	//保存触点0的数据
+			tp_dev.y[4]=tp_dev.y[0];
+			for(i=0;i<5;i++)
+			{
+				if(tp_dev.sta&(1<<i))	//触摸有效?
+				{
+					GT9147_RD_Reg(GT9147_TPX_TBL[i],buf,4);	//读取XY坐标值
+					if(tp_dev.touchtype&0X01)//横屏
+					{
+						tp_dev.y[i]=((u16)buf[1]<<8)+buf[0];
+						tp_dev.x[i]=800-(((u16)buf[3]<<8)+buf[2]);
+					}else
+					{
+						tp_dev.x[i]=((u16)buf[1]<<8)+buf[0];
+						tp_dev.y[i]=((u16)buf[3]<<8)+buf[2];
+					}  
+					//printf("x[%d]:%d,y[%d]:%d\r\n",i,tp_dev.x[i],i,tp_dev.y[i]);
+				}			
+			} 
+			res=1;
+			if(tp_dev.x[0]>lcddev.width||tp_dev.y[0]>lcddev.height)//非法数据(坐标超出了)
+			{ 
+				if((mode&0XF)>1)		//有其他点有数据,则复第二个触点的数据到第一个触点.
+				{
+					tp_dev.x[0]=tp_dev.x[1];
+					tp_dev.y[0]=tp_dev.y[1];
+					t=0;				//触发一次,则会最少连续监测10次,从而提高命中率
+				}else					//非法数据,则忽略此次数据(还原原来的)  
+				{
+					tp_dev.x[0]=tp_dev.x[4];
+					tp_dev.y[0]=tp_dev.y[4];
+					mode=0X80;		
+					tp_dev.sta=tempsta;	//恢复tp_dev.sta
+				}
+			}else t=0;					//触发一次,则会最少连续监测10次,从而提高命中率
+		}
+	}
+
+}
+ 
+
+
 
 
 
