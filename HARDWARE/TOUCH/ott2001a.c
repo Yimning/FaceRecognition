@@ -37,6 +37,3 @@ u8 OTT2001A_WR_Reg(u16 reg,u8 *buf,u8 len)
 }
 
 
-
-
-
