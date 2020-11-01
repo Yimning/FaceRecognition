@@ -65,7 +65,7 @@ void OTT2001A_SensorControl(u8 cmd)
 	if(cmd)regval=0X80;
 	OTT2001A_WR_Reg(OTT_CTRL_REG,&regval,1); 
 } 
-//初始化触摸屏
+
 
 
 
