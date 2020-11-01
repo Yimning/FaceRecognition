@@ -57,6 +57,15 @@ void OTT2001A_RD_Reg(u16 reg,u8 *buf,u8 len)
 	} 
     CT_IIC_Stop();//产生一个停止条件    
 }
+//传感器打开/关闭操作
+//cmd:1,打开传感器;0,关闭传感器
+void OTT2001A_SensorControl(u8 cmd)
+{
+	u8 regval=0X00;
+	if(cmd)regval=0X80;
+	OTT2001A_WR_Reg(OTT_CTRL_REG,&regval,1); 
+} 
+//初始化触摸屏
 
 
 
