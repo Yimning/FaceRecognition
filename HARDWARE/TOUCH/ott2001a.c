@@ -65,6 +65,28 @@ void OTT2001A_SensorControl(u8 cmd)
 	if(cmd)regval=0X80;
 	OTT2001A_WR_Reg(OTT_CTRL_REG,&regval,1); 
 } 
+//初始化触摸屏
+//返回值:0,初始化成功;1,初始化失败 
+u8 OTT2001A_Init(void)
+{
+ 	u8 regval=0; 
+	RCC->AHB1ENR|=1<<1;    		//使能PORTB时钟 
+	RCC->AHB1ENR|=1<<2;    		//使能PORTC时钟  
+	GPIO_Set(GPIOB,PIN1,GPIO_MODE_IN,0,0,GPIO_PUPD_PU); 	//PB1设置为上拉输入
+	GPIO_Set(GPIOC,PIN13,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU); //PC13设置为推挽输出
+	CT_IIC_Init();      	//初始化电容屏的I2C总线  
+	OTT_RST=0;				//复位
+	delay_ms(100);
+ 	OTT_RST=1;				//释放复位		    
+	delay_ms(100); 
+	OTT2001A_SensorControl(1);	//打开传感器 
+	OTT2001A_RD_Reg(OTT_CTRL_REG,&regval,1);//读取传感器运行寄存器的值来判断I2C通信是否正常
+	printf("CTP ID:%x\r\n",regval);
+    if(regval==0x80)return 0;
+	return 1;
+}
+
+const u16 OTT_TPX_TBL[5]={OTT_TP1_REG,OTT_TP2_REG,OTT_TP3_REG,OTT_TP4_REG,OTT_TP5_REG};
 
 
 
