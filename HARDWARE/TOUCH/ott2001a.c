@@ -87,7 +87,12 @@ u8 OTT2001A_Init(void)
 }
 
 const u16 OTT_TPX_TBL[5]={OTT_TP1_REG,OTT_TP2_REG,OTT_TP3_REG,OTT_TP4_REG,OTT_TP5_REG};
+//扫描触摸屏(采用查询方式)
+//mode:0,正常扫描.
+//返回值:当前触屏状态.
+//0,触屏无触摸;1,触屏有触摸
 
+ 
 
 
 
