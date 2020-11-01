@@ -95,5 +95,42 @@ const u16 OTT_TPX_TBL[5]={OTT_TP1_REG,OTT_TP2_REG,OTT_TP3_REG,OTT_TP4_REG,OTT_TP
  
 
 
+u8 OTT2001A_Scan(u8 mode)
+{
+	u8 buf[4];
+	u8 i=0;
+	u8 res=0;
+	static u8 t=0;//控制查询间隔,从而降低CPU占用率   
+	t++;
+	if((t%10)==0||t<10)//空闲时,每进入10次CTP_Scan函数才检测1次,从而节省CPU使用率
+	{
+		OTT2001A_RD_Reg(OTT_GSTID_REG,&mode,1);//读取触摸点的状态  
+		if(mode&0X1F)
+		{
+			tp_dev.sta=(mode&0X1F)|TP_PRES_DOWN|TP_CATH_PRES;
+			for(i=0;i<5;i++)
+			{
+				if(tp_dev.sta&(1<<i))	//触摸有效?
+				{
+					OTT2001A_RD_Reg(OTT_TPX_TBL[i],buf,4);	//读取XY坐标值
+					if(tp_dev.touchtype&0X01)//横屏
+					{
+						tp_dev.y[i]=(((u16)buf[2]<<8)+buf[3])*OTT_SCAL_Y;
+						tp_dev.x[i]=800-((((u16)buf[0]<<8)+buf[1])*OTT_SCAL_X);
+					}else
+					{
+						tp_dev.x[i]=(((u16)buf[2]<<8)+buf[3])*OTT_SCAL_Y;
+						tp_dev.y[i]=(((u16)buf[0]<<8)+buf[1])*OTT_SCAL_X;
+					}  
+					//printf("x[%d]:%d,y[%d]:%d\r\n",i,tp_dev.x[i],i,tp_dev.y[i]);
+				}			
+			} 
+			res=1;
+			if(tp_dev.x[0]==0 && tp_dev.y[0]==0)mode=0;	//读到的数据都是0,则忽略此次数据
+			t=0;		//触发一次,则会最少连续监测10次,从而提高命中率
+		}
+	}
+	if((mode&0X1F)==0)//无触摸点按下
 
+}
 
