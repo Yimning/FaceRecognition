@@ -34,5 +34,30 @@ u8 OTT2001A_WR_Reg(u16 reg,u8 *buf,u8 len)
     CT_IIC_Stop();					//产生一个停止条件	    
 	return ret; 
 }
+//从OTT2001A读出一次数据
+//reg:起始寄存器地址
+//buf:数据缓缓存区
+//len:读数据长度			  
+void OTT2001A_RD_Reg(u16 reg,u8 *buf,u8 len)
+{
+	u8 i; 
+ 	CT_IIC_Start();	
+ 	CT_IIC_Send_Byte(OTT_CMD_WR);   //发送写命令 	 
+	CT_IIC_Wait_Ack();
+ 	CT_IIC_Send_Byte(reg>>8);   	//发送高8位地址
+	CT_IIC_Wait_Ack(); 	 										  		   
+ 	CT_IIC_Send_Byte(reg&0XFF);   	//发送低8位地址
+	CT_IIC_Wait_Ack();  
+ 	CT_IIC_Start();  	 	   
+	CT_IIC_Send_Byte(OTT_CMD_RD);   //发送读命令		   
+	CT_IIC_Wait_Ack();	   
+	for(i=0;i<len;i++)
+	{	   
+    	buf[i]=CT_IIC_Read_Byte(i==(len-1)?0:1); //发数据	  
+	} 
+    CT_IIC_Stop();//产生一个停止条件    
+}
+
+
 
 
