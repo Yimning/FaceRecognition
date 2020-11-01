@@ -9,7 +9,6 @@
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
 
-
 //向OTT2001A写入一次数据
 //reg:起始寄存器地址
 //buf:数据缓缓存区
