@@ -17,6 +17,42 @@
 //电容触摸屏增加FT5206的支持
 //////////////////////////////////////////////////////////////////////////////////
 
+_m_tp_dev tp_dev=
+{
+	TP_Init,
+	TP_Scan,
+	TP_Adjust,
+	0,
+	0, 
+	0,
+	0,
+	0,
+	0,	  	 		
+	0,
+	0,	  	 		
+};					
+//默认为touchtype=0的数据.
+u8 CMD_RDX=0XD0;
+u8 CMD_RDY=0X90;
+ 	 			    					   
+//SPI写数据
+//向触摸屏IC写入1byte数据    
+//num:要写入的数据
+void TP_Write_Byte(u8 num)    
+{  
+	u8 count=0;   
+	for(count=0;count<8;count++)  
+	{ 	  
+		if(num&0x80)TDIN=1;  
+		else TDIN=0;   
+		num<<=1;    
+		TCLK=0; 
+		delay_us(1);
+		TCLK=1;		//上升沿有效	        
+	}		 			    
+} 		 
+
+
 
 
 
