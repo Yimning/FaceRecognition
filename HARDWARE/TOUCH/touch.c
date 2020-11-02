@@ -267,6 +267,185 @@ u8 TP_Get_Adjdata(void)
 }	 
 //提示字符串
 u8* const TP_REMIND_MSG_TBL="Please use the stylus click the cross on the screen.The cross will always move until the screen adjustment is completed.";
+//提示校准结果(各个参数)
+void TP_Adj_Info_Show(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2,u16 x3,u16 y3,u16 fac)
+{	  
+	POINT_COLOR=RED;
+	LCD_ShowString(40,160,lcddev.width,lcddev.height,16,"x1:");
+ 	LCD_ShowString(40+80,160,lcddev.width,lcddev.height,16,"y1:");
+ 	LCD_ShowString(40,180,lcddev.width,lcddev.height,16,"x2:");
+ 	LCD_ShowString(40+80,180,lcddev.width,lcddev.height,16,"y2:");
+	LCD_ShowString(40,200,lcddev.width,lcddev.height,16,"x3:");
+ 	LCD_ShowString(40+80,200,lcddev.width,lcddev.height,16,"y3:");
+	LCD_ShowString(40,220,lcddev.width,lcddev.height,16,"x4:");
+ 	LCD_ShowString(40+80,220,lcddev.width,lcddev.height,16,"y4:");  
+ 	LCD_ShowString(40,240,lcddev.width,lcddev.height,16,"fac is:");     
+	LCD_ShowNum(40+24,160,x0,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,160,y0,4,16);	//显示数值
+	LCD_ShowNum(40+24,180,x1,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,180,y1,4,16);	//显示数值
+	LCD_ShowNum(40+24,200,x2,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,200,y2,4,16);	//显示数值
+	LCD_ShowNum(40+24,220,x3,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,220,y3,4,16);	//显示数值
+ 	LCD_ShowNum(40+56,240,fac,3,16); 	//显示数值,该数值必须在95~105范围之内.
+
+}
+		 
+//触摸屏校准代码
+//得到四个校准参数
+void TP_Adjust(void)
+{								 
+	u16 pos_temp[4][2];//坐标缓存值
+	u8  cnt=0;	
+	u16 d1,d2;
+	u32 tem1,tem2;
+	double fac; 	
+	u16 outtime=0;
+ 	cnt=0;				
+	POINT_COLOR=BLUE;
+	BACK_COLOR =WHITE;
+	LCD_Clear(WHITE);//清屏   
+	POINT_COLOR=RED;//红色 
+	LCD_Clear(WHITE);//清屏 	   
+	POINT_COLOR=BLACK;
+	LCD_ShowString(40,40,160,100,16,(u8*)TP_REMIND_MSG_TBL);//显示提示信息
+	TP_Drow_Touch_Point(20,20,RED);//画点1 
+	tp_dev.sta=0;//消除触发信号 
+	tp_dev.xfac=0;//xfac用来标记是否校准过,所以校准之前必须清掉!以免错误	 
+	while(1)//如果连续10秒钟没有按下,则自动退出
+	{
+		tp_dev.scan(1);//扫描物理坐标
+		if((tp_dev.sta&0xc0)==TP_CATH_PRES)//按键按下了一次(此时按键松开了.)
+		{	
+			outtime=0;		
+			tp_dev.sta&=~(1<<6);//标记按键已经被处理过了.
+						   			   
+			pos_temp[cnt][0]=tp_dev.x[0];
+			pos_temp[cnt][1]=tp_dev.y[0];
+			cnt++;	  
+			switch(cnt)
+			{			   
+				case 1:						 
+					TP_Drow_Touch_Point(20,20,WHITE);				//清除点1 
+					TP_Drow_Touch_Point(lcddev.width-20,20,RED);	//画点2
+					break;
+				case 2:
+ 					TP_Drow_Touch_Point(lcddev.width-20,20,WHITE);	//清除点2
+					TP_Drow_Touch_Point(20,lcddev.height-20,RED);	//画点3
+					break;
+				case 3:
+ 					TP_Drow_Touch_Point(20,lcddev.height-20,WHITE);			//清除点3
+ 					TP_Drow_Touch_Point(lcddev.width-20,lcddev.height-20,RED);	//画点4
+					break;
+				case 4:	 //全部四个点已经得到
+	    		    //对边相等
+					tem1=abs(pos_temp[0][0]-pos_temp[1][0]);//x1-x2
+					tem2=abs(pos_temp[0][1]-pos_temp[1][1]);//y1-y2
+					tem1*=tem1;
+					tem2*=tem2;
+					d1=sqrt(tem1+tem2);//得到1,2的距离
+					
+					tem1=abs(pos_temp[2][0]-pos_temp[3][0]);//x3-x4
+					tem2=abs(pos_temp[2][1]-pos_temp[3][1]);//y3-y4
+					tem1*=tem1;
+					tem2*=tem2;
+					d2=sqrt(tem1+tem2);//得到3,4的距离
+					fac=(float)d1/d2;
+					if(fac<0.95||fac>1.05||d1==0||d2==0)//不合格
+					{
+						cnt=0;
+ 				    	TP_Drow_Touch_Point(lcddev.width-20,lcddev.height-20,WHITE);	//清除点4
+   	 					TP_Drow_Touch_Point(20,20,RED);								//画点1
+ 						TP_Adj_Info_Show(pos_temp[0][0],pos_temp[0][1],pos_temp[1][0],pos_temp[1][1],pos_temp[2][0],pos_temp[2][1],pos_temp[3][0],pos_temp[3][1],fac*100);//显示数据   
+ 						continue;
+					}
+					tem1=abs(pos_temp[0][0]-pos_temp[2][0]);//x1-x3
+					tem2=abs(pos_temp[0][1]-pos_temp[2][1]);//y1-y3
+					tem1*=tem1;
+					tem2*=tem2;
+					d1=sqrt(tem1+tem2);//得到1,3的距离
+					
+					tem1=abs(pos_temp[1][0]-pos_temp[3][0]);//x2-x4
+					tem2=abs(pos_temp[1][1]-pos_temp[3][1]);//y2-y4
+					tem1*=tem1;
+					tem2*=tem2;
+					d2=sqrt(tem1+tem2);//得到2,4的距离
+					fac=(float)d1/d2;
+					if(fac<0.95||fac>1.05)//不合格
+					{
+						cnt=0;
+ 				    	TP_Drow_Touch_Point(lcddev.width-20,lcddev.height-20,WHITE);	//清除点4
+   	 					TP_Drow_Touch_Point(20,20,RED);								//画点1
+ 						TP_Adj_Info_Show(pos_temp[0][0],pos_temp[0][1],pos_temp[1][0],pos_temp[1][1],pos_temp[2][0],pos_temp[2][1],pos_temp[3][0],pos_temp[3][1],fac*100);//显示数据   
+						continue;
+					}//正确了
+								   
+					//对角线相等
+					tem1=abs(pos_temp[1][0]-pos_temp[2][0]);//x1-x3
+					tem2=abs(pos_temp[1][1]-pos_temp[2][1]);//y1-y3
+					tem1*=tem1;
+					tem2*=tem2;
+					d1=sqrt(tem1+tem2);//得到1,4的距离
+	
+					tem1=abs(pos_temp[0][0]-pos_temp[3][0]);//x2-x4
+					tem2=abs(pos_temp[0][1]-pos_temp[3][1]);//y2-y4
+					tem1*=tem1;
+					tem2*=tem2;
+					d2=sqrt(tem1+tem2);//得到2,3的距离
+					fac=(float)d1/d2;
+					if(fac<0.95||fac>1.05)//不合格
+					{
+						cnt=0;
+ 				    	TP_Drow_Touch_Point(lcddev.width-20,lcddev.height-20,WHITE);	//清除点4
+   	 					TP_Drow_Touch_Point(20,20,RED);								//画点1
+ 						TP_Adj_Info_Show(pos_temp[0][0],pos_temp[0][1],pos_temp[1][0],pos_temp[1][1],pos_temp[2][0],pos_temp[2][1],pos_temp[3][0],pos_temp[3][1],fac*100);//显示数据   
+						continue;
+					}//正确了
+					//计算结果
+					tp_dev.xfac=(float)(lcddev.width-40)/(pos_temp[1][0]-pos_temp[0][0]);//得到xfac		 
+					tp_dev.xoff=(lcddev.width-tp_dev.xfac*(pos_temp[1][0]+pos_temp[0][0]))/2;//得到xoff
+						  
+					tp_dev.yfac=(float)(lcddev.height-40)/(pos_temp[2][1]-pos_temp[0][1]);//得到yfac
+					tp_dev.yoff=(lcddev.height-tp_dev.yfac*(pos_temp[2][1]+pos_temp[0][1]))/2;//得到yoff  
+					if(abs(tp_dev.xfac)>2||abs(tp_dev.yfac)>2)//触屏和预设的相反了.
+					{
+						cnt=0;
+ 				    	TP_Drow_Touch_Point(lcddev.width-20,lcddev.height-20,WHITE);	//清除点4
+   	 					TP_Drow_Touch_Point(20,20,RED);								//画点1
+						LCD_ShowString(40,26,lcddev.width,lcddev.height,16,"TP Need readjust!");
+						tp_dev.touchtype=!tp_dev.touchtype;//修改触屏类型.
+						if(tp_dev.touchtype)//X,Y方向与屏幕相反
+						{
+							CMD_RDX=0X90;
+							CMD_RDY=0XD0;	 
+						}else				   //X,Y方向与屏幕相同
+						{
+							CMD_RDX=0XD0;
+							CMD_RDY=0X90;	 
+						}			    
+						continue;
+					}		
+					POINT_COLOR=BLUE;
+					LCD_Clear(WHITE);//清屏
+					LCD_ShowString(35,110,lcddev.width,lcddev.height,16,"Touch Screen Adjust OK!");//校正完成
+					delay_ms(1000);
+					TP_Save_Adjdata();  
+ 					LCD_Clear(WHITE);//清屏   
+					return;//校正完成				 
+			}
+		}
+		delay_ms(10);
+		outtime++;
+		if(outtime>1000)
+		{
+			TP_Get_Adjdata();
+			break;
+	 	} 
+ 	}
+}	 
+
+
  					  
 
 
