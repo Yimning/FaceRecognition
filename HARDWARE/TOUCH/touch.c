@@ -268,34 +268,6 @@ u8 TP_Get_Adjdata(void)
 //提示字符串
 u8* const TP_REMIND_MSG_TBL="Please use the stylus click the cross on the screen.The cross will always move until the screen adjustment is completed.";
  					  
-//提示校准结果(各个参数)
-void TP_Adj_Info_Show(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2,u16 x3,u16 y3,u16 fac)
-{	  
-	POINT_COLOR=RED;
-	LCD_ShowString(40,160,lcddev.width,lcddev.height,16,"x1:");
- 	LCD_ShowString(40+80,160,lcddev.width,lcddev.height,16,"y1:");
- 	LCD_ShowString(40,180,lcddev.width,lcddev.height,16,"x2:");
- 	LCD_ShowString(40+80,180,lcddev.width,lcddev.height,16,"y2:");
-	LCD_ShowString(40,200,lcddev.width,lcddev.height,16,"x3:");
- 	LCD_ShowString(40+80,200,lcddev.width,lcddev.height,16,"y3:");
-	LCD_ShowString(40,220,lcddev.width,lcddev.height,16,"x4:");
- 	LCD_ShowString(40+80,220,lcddev.width,lcddev.height,16,"y4:");  
- 	LCD_ShowString(40,240,lcddev.width,lcddev.height,16,"fac is:");     
-	LCD_ShowNum(40+24,160,x0,4,16);		//显示数值
-	LCD_ShowNum(40+24+80,160,y0,4,16);	//显示数值
-	LCD_ShowNum(40+24,180,x1,4,16);		//显示数值
-	LCD_ShowNum(40+24+80,180,y1,4,16);	//显示数值
-	LCD_ShowNum(40+24,200,x2,4,16);		//显示数值
-	LCD_ShowNum(40+24+80,200,y2,4,16);	//显示数值
-	LCD_ShowNum(40+24,220,x3,4,16);		//显示数值
-	LCD_ShowNum(40+24+80,220,y3,4,16);	//显示数值
- 	LCD_ShowNum(40+56,240,fac,3,16); 	//显示数值,该数值必须在95~105范围之内.
-
-}
-
-
-
-
 
 
 
