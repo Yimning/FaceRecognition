@@ -234,6 +234,65 @@ void TP_Save_Adjdata(void)
 	temp=0X0A;//标记校准过了
 	AT24CXX_WriteOneByte(SAVE_ADDR_BASE+13,temp); 
 }
+//得到保存在EEPROM里面的校准值
+//返回值：1，成功获取数据
+//        0，获取失败，要重新校准
+u8 TP_Get_Adjdata(void)
+{					  
+	s32 tempfac;
+	tempfac=AT24CXX_ReadOneByte(SAVE_ADDR_BASE+13);//读取标记字,看是否校准过！ 		 
+	if(tempfac==0X0A)//触摸屏已经校准过了			   
+	{    												 
+		tempfac=AT24CXX_ReadLenByte(SAVE_ADDR_BASE,4);		   
+		tp_dev.xfac=(float)tempfac/100000000;//得到x校准参数
+		tempfac=AT24CXX_ReadLenByte(SAVE_ADDR_BASE+4,4);			          
+		tp_dev.yfac=(float)tempfac/100000000;//得到y校准参数
+	    //得到x偏移量
+		tp_dev.xoff=AT24CXX_ReadLenByte(SAVE_ADDR_BASE+8,2);			   	  
+ 	    //得到y偏移量
+		tp_dev.yoff=AT24CXX_ReadLenByte(SAVE_ADDR_BASE+10,2);				 	  
+ 		tp_dev.touchtype=AT24CXX_ReadOneByte(SAVE_ADDR_BASE+12);//读取触屏类型标记
+		if(tp_dev.touchtype)//X,Y方向与屏幕相反
+		{
+			CMD_RDX=0X90;
+			CMD_RDY=0XD0;	 
+		}else				   //X,Y方向与屏幕相同
+		{
+			CMD_RDX=0XD0;
+			CMD_RDY=0X90;	 
+		}		 
+		return 1;	 
+	}
+	return 0;
+}	 
+//提示字符串
+u8* const TP_REMIND_MSG_TBL="Please use the stylus click the cross on the screen.The cross will always move until the screen adjustment is completed.";
+ 					  
+//提示校准结果(各个参数)
+void TP_Adj_Info_Show(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2,u16 x3,u16 y3,u16 fac)
+{	  
+	POINT_COLOR=RED;
+	LCD_ShowString(40,160,lcddev.width,lcddev.height,16,"x1:");
+ 	LCD_ShowString(40+80,160,lcddev.width,lcddev.height,16,"y1:");
+ 	LCD_ShowString(40,180,lcddev.width,lcddev.height,16,"x2:");
+ 	LCD_ShowString(40+80,180,lcddev.width,lcddev.height,16,"y2:");
+	LCD_ShowString(40,200,lcddev.width,lcddev.height,16,"x3:");
+ 	LCD_ShowString(40+80,200,lcddev.width,lcddev.height,16,"y3:");
+	LCD_ShowString(40,220,lcddev.width,lcddev.height,16,"x4:");
+ 	LCD_ShowString(40+80,220,lcddev.width,lcddev.height,16,"y4:");  
+ 	LCD_ShowString(40,240,lcddev.width,lcddev.height,16,"fac is:");     
+	LCD_ShowNum(40+24,160,x0,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,160,y0,4,16);	//显示数值
+	LCD_ShowNum(40+24,180,x1,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,180,y1,4,16);	//显示数值
+	LCD_ShowNum(40+24,200,x2,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,200,y2,4,16);	//显示数值
+	LCD_ShowNum(40+24,220,x3,4,16);		//显示数值
+	LCD_ShowNum(40+24+80,220,y3,4,16);	//显示数值
+ 	LCD_ShowNum(40+56,240,fac,3,16); 	//显示数值,该数值必须在95~105范围之内.
+
+}
+
 
 
 
