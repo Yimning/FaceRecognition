@@ -444,6 +444,15 @@ void TP_Adjust(void)
 	 	} 
  	}
 }	 
+//触摸屏初始化  		    
+//返回值:0,没有进行校准
+//       1,进行过校准
+u8 TP_Init(void)
+{	
+	
+	return 1; 									 
+}
+
 
 
  					  
