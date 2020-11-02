@@ -449,7 +449,47 @@ void TP_Adjust(void)
 //       1,进行过校准
 u8 TP_Init(void)
 {	
-	
+if(lcddev.id==0X5510)		//电容触摸屏
+	{
+		if(GT9147_Init()==0)	//是GT9147
+		{ 
+			tp_dev.scan=GT9147_Scan;	//扫描函数指向GT9147触摸屏扫描
+		}else
+		{
+			OTT2001A_Init();
+			tp_dev.scan=OTT2001A_Scan;	//扫描函数指向OTT2001A触摸屏扫描
+		}
+		tp_dev.touchtype|=0X80;	//电容屏 
+		tp_dev.touchtype|=lcddev.dir&0X01;//横屏还是竖屏 
+		return 0;
+	}else if(lcddev.id==0X1963)
+	{
+		FT5206_Init();
+		tp_dev.scan=FT5206_Scan;		//扫描函数指向GT9147触摸屏扫描		
+		tp_dev.touchtype|=0X80;			//电容屏 
+		tp_dev.touchtype|=lcddev.dir&0X01;//横屏还是竖屏 
+		return 0;
+	}else
+	{
+		RCC->AHB1ENR|=1<<1;    		//使能PORTB时钟 
+		RCC->AHB1ENR|=1<<2;    		//使能PORTC时钟
+		RCC->AHB1ENR|=1<<5;    		//使能PORTF时钟  
+ 		GPIO_Set(GPIOB,PIN1|PIN2,GPIO_MODE_IN,0,0,GPIO_PUPD_PU);						//PB1/PB2 设置为上拉输入
+		GPIO_Set(GPIOB,PIN0,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU); 	//PB0设置为推挽输出
+		GPIO_Set(GPIOC,PIN13,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU);	//PC13设置为推挽输出
+ 		GPIO_Set(GPIOF,PIN11,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PU); //PF11设置推挽输出
+   
+		TP_Read_XY(&tp_dev.x[0],&tp_dev.y[0]);//第一次读取初始化	 
+		AT24CXX_Init();		//初始化24CXX
+		if(TP_Get_Adjdata())return 0;//已经校准
+		else			   //未校准?
+		{ 										    
+			LCD_Clear(WHITE);//清屏
+			TP_Adjust();  	//屏幕校准 
+			TP_Save_Adjdata();	 
+		}			
+		TP_Get_Adjdata();	
+	}	
 	return 1; 									 
 }
 
