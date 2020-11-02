@@ -51,6 +51,38 @@ void TP_Write_Byte(u8 num)
 		TCLK=1;		//上升沿有效	        
 	}		 			    
 } 		 
+//SPI读数据 
+//从触摸屏IC读取adc值
+//CMD:指令
+//返回值:读到的数据	   
+u16 TP_Read_AD(u8 CMD)	  
+{ 	 
+	u8 count=0; 	  
+	u16 Num=0; 
+	TCLK=0;		//先拉低时钟 	 
+	TDIN=0; 	//拉低数据线
+	TCS=0; 		//选中触摸屏IC
+	TP_Write_Byte(CMD);//发送命令字
+	delay_us(6);//ADS7846的转换时间最长为6us
+	TCLK=0; 	     	    
+	delay_us(1);    	   
+	TCLK=1;		//给1个时钟，清除BUSY
+	delay_us(1);    
+	TCLK=0; 	     	    
+	for(count=0;count<16;count++)//读出16位数据,只有高12位有效 
+	{ 				  
+		Num<<=1; 	 
+		TCLK=0;	//下降沿有效  	    	   
+		delay_us(1);    
+ 		TCLK=1;
+ 		if(DOUT)Num++; 		 
+	}  	
+	Num>>=4;   	//只有高12位有效.
+	TCS=1;		//释放片选	 
+	return(Num);   
+}
+
+
 
 
 
