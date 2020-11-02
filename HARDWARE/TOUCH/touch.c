@@ -4,6 +4,8 @@
 #include "stdlib.h"
 #include "math.h"
 #include "24cxx.h" 
+      
+
 
 //ALIENTEK STM32F407开发板
 //触摸屏驱动（支持ADS7843/7846/UH7843/7846/XPT2046/TSC2046/OTT2001A等） 代码	   
