@@ -4,14 +4,12 @@
 #include "stdlib.h"
 #include "math.h"
 #include "24cxx.h" 
-      
-
 
 //ALIENTEK STM32F407开发板
 //触摸屏驱动（支持ADS7843/7846/UH7843/7846/XPT2046/TSC2046/OTT2001A等） 代码	   
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
-//********************************************************************************
+
 //修改说明
 //V1.1 20140721
 //修正MDK在-O2优化时,触摸屏数据无法读取的bug.在TP_Write_Byte函数添加一个延时,解决问题.
@@ -269,6 +267,7 @@ u8 TP_Get_Adjdata(void)
 }	 
 //提示字符串
 u8* const TP_REMIND_MSG_TBL="Please use the stylus click the cross on the screen.The cross will always move until the screen adjustment is completed.";
+ 					  
 //提示校准结果(各个参数)
 void TP_Adj_Info_Show(u16 x0,u16 y0,u16 x1,u16 y1,u16 x2,u16 y2,u16 x3,u16 y3,u16 fac)
 {	  
@@ -451,7 +450,7 @@ void TP_Adjust(void)
 //       1,进行过校准
 u8 TP_Init(void)
 {	
-if(lcddev.id==0X5510)		//电容触摸屏
+	if(lcddev.id==0X5510)		//电容触摸屏
 	{
 		if(GT9147_Init()==0)	//是GT9147
 		{ 
@@ -491,16 +490,7 @@ if(lcddev.id==0X5510)		//电容触摸屏
 			TP_Save_Adjdata();	 
 		}			
 		TP_Get_Adjdata();	
-	}	
+	}
 	return 1; 									 
 }
-
-
-
- 					  
-
-
-
-
-
 
