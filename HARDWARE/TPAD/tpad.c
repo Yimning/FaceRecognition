@@ -109,7 +109,10 @@ u8 TPAD_Scan(u8 mode)
 	if(keyen)keyen--;		   							   		     	    					   
 	return res;
 }	 
-//定时器2通道2输入捕获配置	 
+
+
+
+
 
 
 
