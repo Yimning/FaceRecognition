@@ -70,10 +70,20 @@ u16 TPAD_Get_Val(void)
 	};	
 	return TIM2->CCR1;	  
 } 	  
-
-
-
-
+//读取n次,取最大值
+//n：连续获取的次数
+//返回值：n次读数里面读到的最大读数值
+u16 TPAD_Get_MaxVal(u8 n)
+{
+	u16 temp=0;
+	u16 res=0; 
+	while(n--)
+	{
+		temp=TPAD_Get_Val();//得到一次值
+		if(temp>res)res=temp;
+	};
+	return res;
+}  
 
 
 
