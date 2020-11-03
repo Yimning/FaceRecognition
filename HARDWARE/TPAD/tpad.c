@@ -11,9 +11,42 @@
 
 
 
-
-
-
+#define TPAD_ARR_MAX_VAL  0XFFFFFFFF	//最大的ARR值(TIM2是32位定时器)	  
+vu16 tpad_default_val=0;				//空载的时候(没有手按下),计数器需要的时间
+//初始化触摸按键
+//获得空载的时候触摸按键的取值.
+//psc:分频系数,越小,灵敏度越高.
+//返回值:0,初始化成功;1,初始化失败
+u8 TPAD_Init(u8 psc)
+{
+	u16 buf[10];
+	u16 temp;
+	u8 j,i;
+	TIM2_CH1_Cap_Init(TPAD_ARR_MAX_VAL,psc-1);//设置分频系数
+	for(i=0;i<10;i++)//连续读取10次
+	{				 
+		buf[i]=TPAD_Get_Val();
+		delay_ms(10);	    
+	}				    
+	for(i=0;i<9;i++)//排序
+	{
+		for(j=i+1;j<10;j++)
+		{
+			if(buf[i]>buf[j])//升序排列
+			{
+				temp=buf[i];
+				buf[i]=buf[j];
+				buf[j]=temp;
+			}
+		}
+	}
+	temp=0;
+	for(i=2;i<8;i++)temp+=buf[i];//取中间的8个数据进行平均
+	tpad_default_val=temp/6;
+	printf("tpad_default_val:%d\r\n",tpad_default_val);	
+	if(tpad_default_val>TPAD_ARR_MAX_VAL/2)return 1;//初始化遇到超过TPAD_ARR_MAX_VAL/2的数值,不正常!
+	return 0;		     	    					   
+}
 
 
 
