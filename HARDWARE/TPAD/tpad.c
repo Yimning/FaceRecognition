@@ -47,6 +47,10 @@ u8 TPAD_Init(u8 psc)
 	if(tpad_default_val>TPAD_ARR_MAX_VAL/2)return 1;//初始化遇到超过TPAD_ARR_MAX_VAL/2的数值,不正常!
 	return 0;		     	    					   
 }
+//复位一次
+
+
+
 
 
 
