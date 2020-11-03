@@ -48,6 +48,16 @@ u8 TPAD_Init(u8 psc)
 	return 0;		     	    					   
 }
 //复位一次
+//释放电容电量，并清除定时器的计数值
+void TPAD_Reset(void)
+{	
+	GPIO_Set(GPIOA,PIN5,GPIO_MODE_OUT,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_PD);//PA5推挽输出
+	PAout(5)=0; 	//输出0,放电
+	delay_ms(5);
+	TIM2->SR=0;   	//清除标记
+	TIM2->CNT=0;	//归零     
+	GPIO_Set(GPIOA,PIN5,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_NONE);//PA5,复用功能,不带上下拉 
+}
 
 
 
