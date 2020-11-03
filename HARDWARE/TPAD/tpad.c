@@ -5,10 +5,6 @@
 //ALIENTEK STM32F407开发板
 //TPAD驱动代码	   
 //正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//All rights reserved									  
-////////////////////////////////////////////////////////////////////////////////// 	
-
 
 
 #define TPAD_ARR_MAX_VAL  0XFFFFFFFF	//最大的ARR值(TIM2是32位定时器)	  
