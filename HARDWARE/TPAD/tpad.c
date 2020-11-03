@@ -58,6 +58,22 @@ void TPAD_Reset(void)
 	TIM2->CNT=0;	//归零     
 	GPIO_Set(GPIOA,PIN5,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_100M,GPIO_PUPD_NONE);//PA5,复用功能,不带上下拉 
 }
+//得到定时器捕获值
+//如果超时,则直接返回定时器的计数值.
+//返回值：捕获值/计数值（超时的情况下返回）
+u16 TPAD_Get_Val(void)
+{				   
+	TPAD_Reset();
+	while((TIM2->SR&0X04)==0)//等待捕获上升沿
+	{
+		if(TIM2->CNT>TPAD_ARR_MAX_VAL-500)return TIM2->CNT;//超时了,直接返回CNT的值
+	};	
+	return TIM2->CCR1;	  
+} 	  
+
+
+
+
 
 
 
