@@ -23,7 +23,17 @@ void usart2_init(u32 pclk1,u32 bound)
 	temp=(float)(pclk1*1000000)/(bound*16);//得到USARTDIV,OVER8设置为0
 	mantissa=temp;				 			//得到整数部分
 	fraction=(temp-mantissa)*16; 			//得到小数部分,OVER8设置为0	 
-
+    mantissa<<=4;
+	mantissa+=fraction; 
+	RCC->AHB1ENR|=1<<0;   					//使能PORTA口时钟  
+	RCC->APB1ENR|=1<<17;  					//使能串口2时钟 
+	GPIO_Set(GPIOA,PIN2|PIN3,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_50M,GPIO_PUPD_PU);//PA9,PA10,复用功能,上拉输出
+ 	GPIO_AF_Set(GPIOA,2,7);					//PA2,AF7
+	GPIO_AF_Set(GPIOA,3,7);		 			//PA3,AF7  	   
+	//波特率设置
+ 	USART2->BRR=mantissa; 	// 波特率设置	 
+	USART2->CR1|=1<<3;  	//串口发送使能  
+	USART2->CR1|=1<<13;  	//串口使能
 }
 
 
