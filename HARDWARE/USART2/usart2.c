@@ -26,6 +26,6 @@ void usart2_init(u32 pclk1,u32 bound)
 
 
 
-
+ 
 
 
