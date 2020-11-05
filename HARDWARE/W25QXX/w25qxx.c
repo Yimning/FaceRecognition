@@ -258,28 +258,3 @@ void W25QXX_WAKEUP(void)
     delay_us(3);                               //等待TRES1
 }   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
