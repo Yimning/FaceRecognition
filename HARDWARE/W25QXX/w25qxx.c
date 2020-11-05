@@ -239,6 +239,26 @@ void W25QXX_Erase_Sector(u32 Dst_Addr)
     W25QXX_Wait_Busy();   				   //等待擦除完成
 }  
 //等待空闲
+void W25QXX_Wait_Busy(void)   
+{   
+	while((W25QXX_ReadSR()&0x01)==0x01);   // 等待BUSY位清空
+}  
+//进入掉电模式
+void W25QXX_PowerDown(void)   
+{ 
+  	W25QXX_CS=0;                            //使能器件   
+    SPI1_ReadWriteByte(W25X_PowerDown);        //发送掉电命令  
+	W25QXX_CS=1;                            //取消片选     	      
+    delay_us(3);                               //等待TPD  
+}   
+//唤醒
+void W25QXX_WAKEUP(void)   
+{  
+  	W25QXX_CS=0;                            //使能器件   
+    SPI1_ReadWriteByte(W25X_ReleasePowerDown);   //  send W25X_PowerDown command 0xAB    
+	W25QXX_CS=1;                            //取消片选     	      
+    delay_us(3);                               //等待TRES1
+}   
 
 
 
