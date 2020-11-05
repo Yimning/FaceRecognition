@@ -8,7 +8,6 @@
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
 
- 
 u16 W25QXX_TYPE=W25Q128;	//默认是W25Q128
 
 //4Kbytes为一个Sector
@@ -29,7 +28,6 @@ void W25QXX_Init(void)
 	SPI1_SetSpeed(SPI_SPEED_2);		//设置为42M时钟,高速模式 
 	W25QXX_TYPE=W25QXX_ReadID();	//读取FLASH ID.
 }  
-
 
 //读取W25QXX的状态寄存器
 //BIT7  6   5   4   3   2   1   0
@@ -259,6 +257,29 @@ void W25QXX_WAKEUP(void)
 	W25QXX_CS=1;                            //取消片选     	      
     delay_us(3);                               //等待TRES1
 }   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
