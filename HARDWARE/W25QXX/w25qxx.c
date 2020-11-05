@@ -93,5 +93,78 @@ u16 W25QXX_ReadID(void)
 	W25QXX_CS=1;				    
 	return Temp;
 }   		    
+//读取SPI FLASH  
+//在指定地址开始读取指定长度的数据
+//pBuffer:数据存储区
+//ReadAddr:开始读取的地址(24bit)
+//NumByteToRead:要读取的字节数(最大65535)
+void W25QXX_Read(u8* pBuffer,u32 ReadAddr,u16 NumByteToRead)   
+{ 
+ 	u16 i;   										    
+	W25QXX_CS=0;                            //使能器件   
+    SPI1_ReadWriteByte(W25X_ReadData);         //发送读取命令   
+    SPI1_ReadWriteByte((u8)((ReadAddr)>>16));  //发送24bit地址    
+    SPI1_ReadWriteByte((u8)((ReadAddr)>>8));   
+    SPI1_ReadWriteByte((u8)ReadAddr);   
+    for(i=0;i<NumByteToRead;i++)
+	{ 
+        pBuffer[i]=SPI1_ReadWriteByte(0XFF);   //循环读数  
+    }
+	W25QXX_CS=1;  				    	      
+}  
+//SPI在一页(0~65535)内写入少于256个字节的数据
+//在指定地址开始写入最大256字节的数据
+//pBuffer:数据存储区
+//WriteAddr:开始写入的地址(24bit)
+//NumByteToWrite:要写入的字节数(最大256),该数不应该超过该页的剩余字节数!!!	 
+void W25QXX_Write_Page(u8* pBuffer,u32 WriteAddr,u16 NumByteToWrite)
+{
+ 	u16 i;  
+    W25QXX_Write_Enable();                  //SET WEL 
+	W25QXX_CS=0;                            //使能器件   
+    SPI1_ReadWriteByte(W25X_PageProgram);      //发送写页命令   
+    SPI1_ReadWriteByte((u8)((WriteAddr)>>16)); //发送24bit地址    
+    SPI1_ReadWriteByte((u8)((WriteAddr)>>8));   
+    SPI1_ReadWriteByte((u8)WriteAddr);   
+    for(i=0;i<NumByteToWrite;i++)SPI1_ReadWriteByte(pBuffer[i]);//循环写数  
+	W25QXX_CS=1;                            //取消片选 
+	W25QXX_Wait_Busy();					   //等待写入结束
+} 
+//无检验写SPI FLASH 
+//必须确保所写的地址范围内的数据全部为0XFF,否则在非0XFF处写入的数据将失败!
+//具有自动换页功能 
+//在指定地址开始写入指定长度的数据,但是要确保地址不越界!
+//pBuffer:数据存储区
+//WriteAddr:开始写入的地址(24bit)
+//NumByteToWrite:要写入的字节数(最大65535)
+//CHECK OK
+void W25QXX_Write_NoCheck(u8* pBuffer,u32 WriteAddr,u16 NumByteToWrite)   
+{ 			 		 
+	u16 pageremain;	   
+	pageremain=256-WriteAddr%256; //单页剩余的字节数		 	    
+	if(NumByteToWrite<=pageremain)pageremain=NumByteToWrite;//不大于256个字节
+	while(1)
+	{	   
+		W25QXX_Write_Page(pBuffer,WriteAddr,pageremain);
+		if(NumByteToWrite==pageremain)break;//写入结束了
+	 	else //NumByteToWrite>pageremain
+		{
+			pBuffer+=pageremain;
+			WriteAddr+=pageremain;	
+
+			NumByteToWrite-=pageremain;			  //减去已经写入了的字节数
+			if(NumByteToWrite>256)pageremain=256; //一次可以写入256个字节
+			else pageremain=NumByteToWrite; 	  //不够256个字节了
+		}
+	};	    
+} 
+//写SPI FLASH  
+//在指定地址开始写入指定长度的数据
+//该函数带擦除操作!
+//pBuffer:数据存储区
+//WriteAddr:开始写入的地址(24bit)						
+//NumByteToWrite:要写入的字节数(最大65535)   
+u8 W25QXX_BUFFER[4096];		 
+
 
 
