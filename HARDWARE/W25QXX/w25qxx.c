@@ -30,3 +30,49 @@ void W25QXX_Init(void)
 	W25QXX_TYPE=W25QXX_ReadID();	//读取FLASH ID.
 }  
 
+
+//读取W25QXX的状态寄存器
+//BIT7  6   5   4   3   2   1   0
+//SPR   RV  TB BP2 BP1 BP0 WEL BUSY
+//SPR:默认0,状态寄存器保护位,配合WP使用
+//TB,BP2,BP1,BP0:FLASH区域写保护设置
+//WEL:写使能锁定
+//BUSY:忙标记位(1,忙;0,空闲)
+//默认:0x00
+u8 W25QXX_ReadSR(void)   
+{  
+	u8 byte=0;   
+	W25QXX_CS=0;                            //使能器件   
+	SPI1_ReadWriteByte(W25X_ReadStatusReg);    //发送读取状态寄存器命令    
+	byte=SPI1_ReadWriteByte(0Xff);             //读取一个字节  
+	W25QXX_CS=1;                            //取消片选     
+	return byte;   
+} 
+//写W25QXX状态寄存器
+//只有SPR,TB,BP2,BP1,BP0(bit 7,5,4,3,2)可以写!!!
+void W25QXX_Write_SR(u8 sr)   
+{   
+	W25QXX_CS=0;                            //使能器件   
+	SPI1_ReadWriteByte(W25X_WriteStatusReg);   //发送写取状态寄存器命令    
+	SPI1_ReadWriteByte(sr);               //写入一个字节  
+	W25QXX_CS=1;                            //取消片选     	      
+}   
+//W25QXX写使能	
+//将WEL置位   
+void W25QXX_Write_Enable(void)   
+{
+	W25QXX_CS=0;                            //使能器件   
+    SPI1_ReadWriteByte(W25X_WriteEnable);      //发送写使能  
+	W25QXX_CS=1;                            //取消片选     	      
+} 
+//W25QXX写禁止	
+//将WEL清零  
+void W25QXX_Write_Disable(void)   
+{  
+	W25QXX_CS=0;                            //使能器件   
+    SPI1_ReadWriteByte(W25X_WriteDisable);     //发送写禁止指令    
+	W25QXX_CS=1;                            //取消片选     	      
+} 		
+//读取芯片ID
+
+
