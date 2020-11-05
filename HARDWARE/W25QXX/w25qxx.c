@@ -74,5 +74,24 @@ void W25QXX_Write_Disable(void)
 	W25QXX_CS=1;                            //取消片选     	      
 } 		
 //读取芯片ID
+//返回值如下:				   
+//0XEF13,表示芯片型号为W25Q80  
+//0XEF14,表示芯片型号为W25Q16    
+//0XEF15,表示芯片型号为W25Q32  
+//0XEF16,表示芯片型号为W25Q64 
+//0XEF17,表示芯片型号为W25Q128 	  
+u16 W25QXX_ReadID(void)
+{
+	u16 Temp = 0;	  
+	W25QXX_CS=0;				    
+	SPI1_ReadWriteByte(0x90);//发送读取ID命令	    
+	SPI1_ReadWriteByte(0x00); 	    
+	SPI1_ReadWriteByte(0x00); 	    
+	SPI1_ReadWriteByte(0x00); 	 			   
+	Temp|=SPI1_ReadWriteByte(0xFF)<<8;  
+	Temp|=SPI1_ReadWriteByte(0xFF);	 
+	W25QXX_CS=1;				    
+	return Temp;
+}   		    
 
 
