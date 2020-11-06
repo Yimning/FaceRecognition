@@ -1,11 +1,10 @@
 #include "wdg.h"
 #include "led.h"
-//////////////////////////////////////////////////////////////////////////////////	 
 
 //ALIENTEK STM32F407开发板
 //看门狗 驱动代码	   
 //正点原子@ALIENTEK
-//技术论坛:www.openedv.com		
+//技术论坛:www.openedv.com
 //********************************************************************************
 //V1.1 20140504
 //增加了窗口看门狗相关函数。
@@ -51,13 +50,11 @@ void WWDG_Init(u8 tr,u8 wr,u8 fprer)
 	WWDG->SR=0X00; 			//清除提前唤醒中断标志位 
 	WWDG->CFR|=1<<9;        //使能提前唤醒中断 
 } 
-
 //重设置WWDG计数器的值 
 void WWDG_Set_Counter(u8 cnt) 
 { 
 	WWDG->CR =(cnt&0x7F);//重设置7位计数器 
 } 
-
 //窗口看门狗中断服务程序 
 void WWDG_IRQHandler(void) 
 {      
@@ -65,5 +62,10 @@ void WWDG_IRQHandler(void)
 	WWDG->SR=0X00;//清除提前唤醒中断标志位 
 	LED1=!LED1; 
 }
+
+
+
+
+
 
 
