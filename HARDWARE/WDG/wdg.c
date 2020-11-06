@@ -52,6 +52,13 @@ void WWDG_Init(u8 tr,u8 wr,u8 fprer)
 	WWDG->CFR|=1<<9;        //使能提前唤醒中断 
 } 
 
+//重设置WWDG计数器的值 
+void WWDG_Set_Counter(u8 cnt) 
+{ 
+	WWDG->CR =(cnt&0x7F);//重设置7位计数器 
+} 
+
+
 
 
 
