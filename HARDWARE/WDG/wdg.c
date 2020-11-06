@@ -58,6 +58,13 @@ void WWDG_Set_Counter(u8 cnt)
 	WWDG->CR =(cnt&0x7F);//重设置7位计数器 
 } 
 
+//窗口看门狗中断服务程序 
+void WWDG_IRQHandler(void) 
+{      
+	WWDG_Set_Counter(WWDG_CNT);//重设窗口看门狗的值!         
+	WWDG->SR=0X00;//清除提前唤醒中断标志位 
+	LED1=!LED1; 
+}
 
 
 
