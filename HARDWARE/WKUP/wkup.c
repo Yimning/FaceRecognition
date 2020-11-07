@@ -71,6 +71,28 @@ u8 Check_WKUP(void)
 //中断,检测到PA0脚的一个上升沿.	  
 //中断线0线上的中断检测
 void EXTI0_IRQHandler(void)
+{ 		  
+	EXTI->PR=1<<0;  //清除LINE10上的中断标志位  
+	if(Check_WKUP())//关机?
+	{		  
+		Sys_Enter_Standby();  
+	}
+} 
+//PA0 WKUP唤醒初始化
+void WKUP_Init(void)
+{	  		  
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
