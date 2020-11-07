@@ -40,6 +40,39 @@ void Sys_Enter_Standby(void)
 //检测WKUP脚的信号
 //返回值1:连续按下3s以上
 //      0:错误的触发	
+u8 Check_WKUP(void) 
+{
+	u8 t=0;
+	u8 tx=0;//记录松开的次数
+	LED0=0; //亮灯DS0 
+	while(1)
+	{
+		if(WKUP_KD)//已经按下了
+		{
+			t++;
+			tx=0;
+		}else 
+		{
+			tx++; 
+			if(tx>3)//超过90ms内没有WKUP信号
+			{
+				LED0=1;
+				return 0;//错误的按键,按下次数不够
+			}
+		}
+		delay_ms(30);
+		if(t>=100)//按下超过3秒钟
+		{
+			LED0=0;	  //点亮DS0 
+			return 1; //按下3s以上了
+		}
+	}
+}  
+//中断,检测到PA0脚的一个上升沿.	  
+//中断线0线上的中断检测
+void EXTI0_IRQHandler(void)
+
+
 
 
 
