@@ -81,6 +81,9 @@ void EXTI0_IRQHandler(void)
 //PA0 WKUP唤醒初始化
 void WKUP_Init(void)
 {	  		  
+	RCC->AHB1ENR|=1<<0;    		//使能PORTA时钟	   
+	GPIO_Set(GPIOA,PIN0,GPIO_MODE_IN,0,0,GPIO_PUPD_PD);	//PA0设置 
+	//(检查是否是正常开)机    		 
 
 }
 
