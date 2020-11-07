@@ -36,6 +36,11 @@ void Sys_Enter_Standby(void)
 	RTC->CR|=tempreg;		//重新设置RTC中断 
 	RTC->WPR=0xFF;			//使能RTC寄存器写保护  
 	Sys_Standby();	//进入待机模式
+}
+//检测WKUP脚的信号
+//返回值1:连续按下3s以上
+//      0:错误的触发	
+
 
 
 
