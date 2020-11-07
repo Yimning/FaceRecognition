@@ -84,7 +84,12 @@ void WKUP_Init(void)
 	RCC->AHB1ENR|=1<<0;    		//使能PORTA时钟	   
 	GPIO_Set(GPIOA,PIN0,GPIO_MODE_IN,0,0,GPIO_PUPD_PD);	//PA0设置 
 	//(检查是否是正常开)机    		 
-
+    if(Check_WKUP()==0)
+	{
+ 		Sys_Enter_Standby();	//不是开机,进入待机模式  
+	}
+	Ex_NVIC_Config(GPIO_A,0,RTIR);	//PA0上升沿触发	    										   		   
+	MY_NVIC_Init(2,2,EXTI0_IRQn,2);	//抢占2，子优先级2，组2
 }
 
 
