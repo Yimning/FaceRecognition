@@ -92,21 +92,3 @@ void WKUP_Init(void)
 	MY_NVIC_Init(2,2,EXTI0_IRQn,2);	//抢占2，子优先级2，组2
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
