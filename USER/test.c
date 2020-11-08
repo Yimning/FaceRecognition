@@ -50,6 +50,46 @@ void sw_ov2640_mode(void)
  	GPIO_AF_Set(GPIOC,9,13);	//PC9,AF13  DCMI_D3
  	GPIO_AF_Set(GPIOC,11,13);	//PC11,AF13 DCMI_D4  
 } 
+//切换为SD卡模式
+void sw_sdcard_mode(void)
+{
+	OV2640_PWDN=1;//OV2640 Power Down 
+	//GPIOC8/9/11切换为 SDIO接口
+  	GPIO_AF_Set(GPIOC,8,12);	//PC8,AF12
+ 	GPIO_AF_Set(GPIOC,9,12);	//PC9,AF12 
+ 	GPIO_AF_Set(GPIOC,11,12);	//PC11,AF12  
+} 
+
+////////////////////////////////////////////////////////////////////////////////////////// 
+//LCD显示区域限制参数
+u16 face_offx,face_offy;
+u16 face_xsize,face_ysize; 
+
+u8 fontsize=12;		//字体大小
+
+//设置图像到屏幕最中心.
+void set_image_center(void)
+{
+	face_offx=0;
+	face_offy=0;
+	face_xsize=lcddev.width;
+	face_ysize=lcddev.height;
+	if(lcddev.id==0X1963||lcddev.id==0X5510)
+	{ 
+		face_offy=80;
+		face_ysize=640;
+		fontsize=24;
+	}else if(lcddev.id==0X5310)
+	{
+		face_offx=10;
+		face_offy=40;
+		face_xsize=300;
+		face_ysize=400;
+		fontsize=16;
+	}else fontsize=12;
+	LCD_Set_Window(face_offx,face_offy,face_xsize,face_ysize);	//设置开窗口.  
+}
+
 
 
 
