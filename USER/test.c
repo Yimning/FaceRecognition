@@ -89,6 +89,7 @@ void set_image_center(void)
 	}else fontsize=12;
 	LCD_Set_Window(face_offx,face_offy,face_xsize,face_ysize);	//设置开窗口.  
 }
+
 //读取原始图片数据
 //dbuf:数据缓存区
 //xoff,yoff:要读取的图像区域起始坐标
@@ -138,6 +139,7 @@ void frec_show_msg(u8* str,u8 line)
 }	
 
 u16 * pixdatabuf; 			//图像缓存
+
 int main(void)
 {        
 	u8 res;							  
@@ -199,6 +201,7 @@ int main(void)
 	OV2640_ImageWin_Set((1600-900)/2,0,900,1200);//设置输出尺寸为:900*1200,3:4比例
  	DCMI_Init();			//DCMI配置
 	DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);//DCMI DMA配置  
+
 	LCD_Clear(BLACK);
 	set_image_center();		//设置到屏幕正中央
 	frec_load_ui(fontsize);	//显示GUI 
@@ -295,48 +298,6 @@ int main(void)
  		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
