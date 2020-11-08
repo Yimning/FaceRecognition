@@ -41,6 +41,8 @@ void jpeg_data_process(void)
 	{ 
 	}
 } 
+
+
 //切换为OV2640模式
 void sw_ov2640_mode(void)
 {
