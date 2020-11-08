@@ -138,6 +138,15 @@ void frec_show_msg(u8* str,u8 line)
 }	
 
 u16 * pixdatabuf; 			//图像缓存
+int main(void)
+{        
+
+}
+
+
+
+
+
 
 
 
