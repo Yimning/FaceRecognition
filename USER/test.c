@@ -199,7 +199,20 @@ int main(void)
 	OV2640_ImageWin_Set((1600-900)/2,0,900,1200);//设置输出尺寸为:900*1200,3:4比例
  	DCMI_Init();			//DCMI配置
 	DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);//DCMI DMA配置  
+	LCD_Clear(BLACK);
+	set_image_center();		//设置到屏幕正中央
+	frec_load_ui(fontsize);	//显示GUI 
+ 	OV2640_OutSize_Set(face_xsize,face_ysize); 
+	sw_sdcard_mode();		//SD卡模式 
+	res=atk_frec_initialization();	//初始化人脸识别
+	if(res)
+	{
+		printf("atk_frec_initialization error:%d\r\n",res);//打印错误代码
+	} 
+	sw_ov2640_mode();	//2640模式
+	DCMI_Start();		//启动传输 
 
+}
 
 
 
