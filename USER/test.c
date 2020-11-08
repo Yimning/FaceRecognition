@@ -89,6 +89,64 @@ void set_image_center(void)
 	}else fontsize=12;
 	LCD_Set_Window(face_offx,face_offy,face_xsize,face_ysize);	//设置开窗口.  
 }
+//读取原始图片数据
+//dbuf:数据缓存区
+//xoff,yoff:要读取的图像区域起始坐标
+//xsize:要读取的图像区域宽度
+//width:要读取的宽度(宽高比恒为3:4)  
+void frec_get_image_data(u16 *dbuf,u16 xoff,u16 yoff,u16 xsize,u16 width)
+{
+	int w, h; 
+	u16 height=width*4/3;
+	float scale=(float)xsize/width;
+	for(h=0;h<height;h++)
+	{
+		for(w=0;w<width;w++)
+		{
+			dbuf[h*width+w]=LCD_ReadPoint(xoff+w*scale,yoff+h*scale); 
+ 		}
+	}
+}
+//加载一个简单界面
+//fsize:字体大小
+void frec_load_ui(u8 fsize)
+{
+	if(fsize==16)
+	{ 				    	 
+		Show_Str(10,2,310,fsize,"KEY0:开始识别  KEY2:删除所有模板",fsize,1);	 			    	 
+		Show_Str(10,4+16,310,fsize,"WK_UP:添加人脸模板",fsize,1);				    	 
+	}else if(fsize==24)
+	{
+		Show_Str(10,10,470,fsize,"KEY0:开始识别  KEY2:删除所有模板",fsize,1);	 			    	 
+		Show_Str(10,20+24,470,fsize,"WK_UP:添加人脸模板",fsize,1);				    	 		
+	}
+}
+//显示提示信息
+//str:要显示的字符串 
+//line:第几行;0,第一行;1,第二行;其他,非法.
+//fsize:字体大小
+void frec_show_msg(u8* str,u8 line)
+{
+	if(line>1)return;
+	if(lcddev.width==240)
+	{ 
+		Show_Str(10,lcddev.height-(2-line)*fontsize-(2-line)*5,lcddev.width,fontsize,str,fontsize,0);
+	}else
+	{
+		Show_Str(10,lcddev.height-(2-line)*fontsize-(2-line)*(face_offy-fontsize*2)/3,lcddev.width,fontsize,str,fontsize,1);		
+	} 
+}	
+
+u16 * pixdatabuf; 			//图像缓存
+
+
+
+
+
+
+
+
+
 
 
 
