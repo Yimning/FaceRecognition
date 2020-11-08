@@ -140,6 +140,31 @@ void frec_show_msg(u8* str,u8 line)
 u16 * pixdatabuf; 			//图像缓存
 int main(void)
 {        
+	u8 res;							  
+	u8 key;					//键值		   
+	u8 i;						 
+ 	u8 msgbuf[30];			//消息缓存区 
+	u8 person;
+	
+	
+	Stm32_Clock_Init(336,8,2,7);//设置时钟,168Mhz 
+	delay_init(168);			//延时初始化  
+	uart_init(84,115200);		//初始化串口波特率为115200 
+	LED_Init();					//初始化LED 
+	usmart_dev.init(84);		//初始化USMART
+	TIM3_Int_Init(100-1,8400-1);//10Khz计数,10ms中断一次
+ 	LCD_Init();					//LCD初始化  
+	FSMC_SRAM_Init();			//初始化外部SRAM.
+ 	BEEP_Init();				//蜂鸣器初始化
+ 	KEY_Init();					//按键初始化   
+	W25QXX_Init();				//初始化W25Q128 
+	my_mem_init(SRAMIN);		//初始化内部内存池 
+	my_mem_init(SRAMEX);		//初始化内部内存池  
+	my_mem_init(SRAMCCM);		//初始化CCM内存池 
+	exfuns_init();				//为fatfs相关变量申请内存  
+  	f_mount(fs[0],"0:",1); 		//挂载SD卡  
+  	f_mount(fs[1],"1:",1); 		//挂载SPI FLASH
+	POINT_COLOR=RED;      
 
 }
 
