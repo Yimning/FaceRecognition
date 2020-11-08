@@ -165,8 +165,42 @@ int main(void)
   	f_mount(fs[0],"0:",1); 		//挂载SD卡  
   	f_mount(fs[1],"1:",1); 		//挂载SPI FLASH
 	POINT_COLOR=RED;      
+	while(font_init()) 			//检查字库
+	{	    
+		LCD_ShowString(30,50,200,16,16,"Font Error!");
+		delay_ms(200);				  
+		LCD_Fill(30,50,240,66,WHITE);//清除显示	     
+		delay_ms(200);				  
+	}  	 
+ 	Show_Str(30,50,200,16,"Explorer STM32F4开发板",16,0);	 			    	 
+	Show_Str(30,70,200,16,"人脸识别实验",16,0);				    	 
+	Show_Str(30,90,200,16,"KEY0:开始识别",16,0);			    	 
+	Show_Str(30,110,200,16,"KEY2:删除所有模板",16,0);					    	 
+	Show_Str(30,130,200,16,"WK_UP:添加人脸模板",16,0);				    	 
+	Show_Str(30,150,200,16,"2015年10月2日",16,0);
+	while(SD_Init())//检查SD卡
+	{	     
+		Show_Str(30,190,240,16,"SD Card Error!",16,0);
+		delay_ms(200);
+	    LCD_Fill(30,190,239,206,WHITE);
+		delay_ms(200);			  
+	}   	  
+	while(OV2640_Init())//初始化OV2640
+	{
+		Show_Str(30,190,240,16,"OV7670 错误!",16,0);
+		delay_ms(200);
+	    LCD_Fill(30,190,239,206,WHITE);
+		delay_ms(200);
+	}	  
+	pixdatabuf=mymalloc(SRAMIN,ATK_GABOR_IMG_WID*ATK_GABOR_IMG_HEI*2);	//申请内存
+ 	Show_Str(30,190,200,16,"OV2640 正常",16,0);
+	delay_ms(2000);
+ 	OV2640_RGB565_Mode();	//RGB565输出
+	OV2640_ImageWin_Set((1600-900)/2,0,900,1200);//设置输出尺寸为:900*1200,3:4比例
+ 	DCMI_Init();			//DCMI配置
+	DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);//DCMI DMA配置  
 
-}
+
 
 
 
