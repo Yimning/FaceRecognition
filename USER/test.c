@@ -211,7 +211,89 @@ int main(void)
 	} 
 	sw_ov2640_mode();	//2640模式
 	DCMI_Start();		//启动传输 
-
+	while(1)
+	{	 
+		delay_ms(10);
+ 		key=KEY_Scan(0);//不支持连按
+		if(key)
+		{
+			DCMI_Stop();		//停止传输 
+			sw_sdcard_mode();	//SD卡模式
+			switch(key)
+			{
+				case KEY2_PRES: //删除所有模板
+ 					sprintf((char*)msgbuf,"正在删除...");
+					frec_show_msg(msgbuf,0);	 			    	 
+					for(i=0;i<MAX_LEBEL_NUM;i++)
+					{
+						res=atk_frec_delete_data(i);//删除模板
+						if(res==FR_OK)printf("delete face:%d ok\r\n",i);
+						else printf("delete face:%d failed\r\n",i);
+					} 
+					atk_frec_load_data_model();	//重新加载所有识别模型(被删掉的,将无法加载进来.)
+ 					if(lcddev.width!=240)LCD_Fill(10,lcddev.height-2*fontsize-2*(face_offy-fontsize*2)/3,lcddev.width,lcddev.height,BLACK);	//清除之前的显示
+ 					sprintf((char*)msgbuf,"删除完成");
+					frec_show_msg(msgbuf,0);	 			    	 
+					delay_ms(1000);
+ 					if(lcddev.width!=240)LCD_Fill(10,lcddev.height-2*fontsize-2*(face_offy-fontsize*2)/3,lcddev.width,lcddev.height,BLACK);		//清除显示
+					break;
+				case KEY0_PRES: //识别人脸
+					frec_get_image_data(pixdatabuf,face_offx,face_offy,face_xsize,30);//读取图像数据 
+ 					sprintf((char*)msgbuf,"正在识别...");
+					frec_show_msg(msgbuf,0);	 			    	 
+					reg_time=0; 
+ 					res=atk_frec_recognition_face(pixdatabuf,&person);//进行识别
+					if(res==ATK_FREC_MODEL_DATA_ERR)
+					{	 
+						sprintf((char*)msgbuf,"没有可用模板,按KEY_UP添加模板!");
+					}else if(res==ATK_FREC_UNREC_FACE_ERR)
+					{	
+						sprintf((char*)msgbuf,"无法识别该人脸,请重试!"); 
+					}else 
+					{
+						sprintf((char*)msgbuf,"识别结果:%02d号  耗时:%dms",person,reg_time*10);  
+					}
+ 					if(lcddev.width!=240)LCD_Fill(10,lcddev.height-2*fontsize-2*(face_offy-fontsize*2)/3,lcddev.width,lcddev.height,BLACK);			//清除之前的显示
+					frec_show_msg(msgbuf,0);	 			    	 
+					sprintf((char*)msgbuf,"按任意按键继续!");  
+					frec_show_msg(msgbuf,1);	 			    	 
+					while(!KEY_Scan(0))	//等待按键输入
+					{
+						delay_ms(10); 
+					}
+ 					if(lcddev.width!=240)LCD_Fill(10,lcddev.height-2*fontsize-2*(face_offy-fontsize*2)/3,lcddev.width,lcddev.height,BLACK);
+					break;
+				case WKUP_PRES://添加一个人像进入数据库
+ 					frec_get_image_data(pixdatabuf,face_offx,face_offy,face_xsize,30);//读取图像数据
+					sprintf((char*)msgbuf,"正在添加人脸模板...");
+					frec_show_msg(msgbuf,0);	 			    	 
+					res=atk_frec_add_a_face(pixdatabuf,&person);	//添加一个人脸
+					if(res==0)
+					{
+						sprintf((char*)msgbuf,"添加成功,编号:%02d   ",person);
+						atk_frec_load_data_model();	//重新加载所有识别模型(将添加的人脸,加载进来)
+					}else 
+					{
+						sprintf((char*)msgbuf,"添加失败,错误代码:%02d",res);
+					}
+					frec_show_msg(msgbuf,1);	 			    	 
+					delay_ms(1000);
+					if(lcddev.width!=240)LCD_Fill(10,lcddev.height-2*fontsize-2*(face_offy-fontsize*2)/3,lcddev.width,lcddev.height,BLACK);
+					break;  
+				default :
+					break;
+			} 
+			sw_ov2640_mode();	//2640模式
+			DCMI_Start(); 				//启动传输 
+		}
+		delay_ms(10);
+		i++;
+		if(i==20)//DS0闪烁.
+		{
+			i=0;
+			LED0=!LED0;
+ 		}
+	}
 }
 
 
